@@ -36,4 +36,5 @@ user_data <- stream_in(file("yelp_academic_dataset_user.json")) #note that strea
 tip_data  <- stream_in(file("yelp_academic_dataset_tip.json")) #note that stream_in reads the json lines (as the files are json lines, not json)
 
 
+#4.0 Create a test dataset containing 10,000 randomly drawn observations -- using the “caret” package in R (or the function “sample()”)
 
