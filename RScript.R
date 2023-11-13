@@ -11,7 +11,7 @@
 setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 2.0")
 
 ##2.2 Download and Load Tidyverse Package
-install.packages("tidyverse")
+install.packages("tidyverse") 
 library(tidyverse)
 
 ##2.3 Set seed to control randomisation
