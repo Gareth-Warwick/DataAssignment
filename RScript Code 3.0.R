@@ -111,9 +111,8 @@ wordcloud2(Wordcloud_5star) # Display the word cloud
 ##6.3 Create wordcloud for 1-star ratings
 General1star <- subset(review_data_small2, stars == 1)
 General1star_text <- paste(General1star$text, collapse = " ")
-Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])))
+Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])),max.words=100,colors=c("chartreuse", "cornflowerblue", "darkorange"))
 wordcloud2(Wordcloud_1star) # Display the word cloud 
-
 
 
 
