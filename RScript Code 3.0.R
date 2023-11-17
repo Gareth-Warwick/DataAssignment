@@ -18,7 +18,7 @@ rm(list=ls())
 
 
 
-#2.0 Loading the data
+#2.0 DATA COLLECTION: Loading the data
 
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
 
@@ -42,7 +42,7 @@ View(business_data)
 
 
 
-#3.0 View summary of star ratings 
+#3.0 DATA UNDERSTANDING: View summary of star ratings 
 install.packages("janitor")
 library(janitor)
 tabyl(review_data_small$stars, sort=TRUE)
@@ -52,18 +52,19 @@ tabyl(review_data_small$stars, sort=TRUE)
 
 
 
-#4.0 Clean the data
+#4.0 DATA PREPARATION: Clean the data
 
 ##4.1 In review_data_small --> drop columns "useful", "funny", "cool" as these are other users' reactions to consumer i's rating/review --> not relevant
 review_data_small2 = subset(review_data_small, select = -c(5,6,7) )
+View(review_data_small2)
 
 
 
 
 
-#5.0 Split the data "review_data_small2"
+#5.0 DATA PREPARATION: Split the data "review_data_small2"
 
-##5.1 Create the training data
+##5.1 Create the TRAINING data
 
 train <- sample(1:nrow(review_data_small2), 7*nrow(review_data_small2)/8) #split 7/8 and 1/8
 review_train <- review_data_small2[train,]
@@ -76,7 +77,7 @@ review_y_train <- review_train[,4] #Create vector containing ONLY the predictor 
 
 
 
-##5.2 Create the test data (ie the data not in the training data)
+##5.2 Create the TEST data (ie the data not in the training data)
 review_test<- review_data_small2[-train,]
 
 ###5.2.1 Predictor variables in test data 
@@ -89,29 +90,55 @@ review_y_test <- review_test[,4]
 
 
 
-#6.0 Get a general sense of the words associated with 5-star and 1-star --> using Wordcloud
+#6.0 DATA PREPARATION: Create tokens from the words appearing in the input corpus --> use the tokens to construct a model
+install.packages("tm")
+library(tm)
+
+#provides the corpus of text data from which the DTM will be constructed -- The corpus is typically represented as a collection of documents, each containing text data
+reviewCorpus <- Corpus(VectorSource(review_x_train$text))
+
+#generates a document text matrix from the provided corpus
+vectorizer <- DocumentTermMatrix(reviewCorpus, control = list(
+  verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
+  stem=TRUE, #convert words to their root form
+  stopwords=TRUE, #removes common stopwords (ie words considered to be less informative for text analysis)
+  asPlain=TRUE, #convert input text into plain text, removing html tags and other formatting)
+  tolower=TRUE, #converts all tags into lower case
+  removePunctuation=TRUE, #remove punctuation
+  removeSeparators=TRUE, #remove whitespace separators (eg.tabs and newline characters) --> leave only single spaces between words
+  stripWhitespace=TRUE, #removes leading and trailing whitespace from each word
+  minWordLength=1, #includes words of any length in the vocabulary, including single-letter words
+  bounds=list(global=c(1,Inf)))) #specifies that only words appearing in at least one document (lower bound) will be included, with no upper bound (Inf) on document frequency
+
+
+
+
+
+
+
+#SCRAPPED -- 6.0 Get a general sense of the words associated with 5-star and 1-star --> using Wordcloud 
+#NOTE: Consider scrapping this since not particularly useful 
 
 ##6.1 Install and load packages needed to create wordcloud
 install.packages("tm")
 install.packages("wordcloud2")
 install.packages("wordcloud")
-install.packages("RColorBrewer")
 library(tm)
 library(wordcloud2)
-library(wordcloud)
 library(RColorBrewer)
+library(wordcloud)
 
 ##6.2 Create wordcloud for 5-star ratings
-General5star <- subset(review_data_small2, stars == 5)
-General5star_text <- paste(General5star$text, collapse = " ")
-Worldcloud_5star <- wordcloud(words = strsplit(General5star_text, " ")[[1]], freq = rep(1, length(strsplit(General5star_text, " ")[[1]])))
+General5star <- subset(review_data_small2, stars == 5, select = text)
+General5star_text <- paste(General5star, collapse = " ")
+Worldcloud_5star <- wordcloud(words = strsplit(General5star_text, " ")[[1]], freq = rep(1, length(strsplit(General5star_text, " ")[[1]])),colors=c("chartreuse", "cornflowerblue", "darkorange"),max.words=100)
 wordcloud2(Wordcloud_5star) # Display the word cloud 
 
 
 ##6.3 Create wordcloud for 1-star ratings
 General1star <- subset(review_data_small2, stars == 1)
 General1star_text <- paste(General1star$text, collapse = " ")
-Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])),max.words=100,colors=c("chartreuse", "cornflowerblue", "darkorange"))
+Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])),colors=c("chartreuse", "cornflowerblue", "darkorange"),max.words=100)
 wordcloud2(Wordcloud_1star) # Display the word cloud 
 
 
