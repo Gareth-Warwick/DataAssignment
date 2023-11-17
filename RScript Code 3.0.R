@@ -31,6 +31,12 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 ####2.4.2.1 Load the dataset "user_data_small"
 load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_user_small.Rda")
 
+###2.4.2 Load the .json data "business_data"
+install.packages("jsonlite")
+library(jsonlite)
+business_data <- stream_in(file("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/yelp_academic_dataset_business.json"))
+
 ###2.4.3 View the data
 View(review_data_small)
 View(user_data_small)
+View(business_data)
