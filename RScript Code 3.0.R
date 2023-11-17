@@ -32,5 +32,5 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_user_small.Rda")
 
 ###2.4.3 View the data
-view(review_data_small)
-view(user_data_small)
+View(review_data_small)
+View(user_data_small)
