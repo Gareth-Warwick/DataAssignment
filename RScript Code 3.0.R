@@ -70,5 +70,8 @@ review_train <- review_data_small2[train,]
 review_x_train <- review_train[,-4] #Create data frame, excluding the predictor variable (ie stars) which is in column 4 in "review_data_small2"
 review_y_train <- review_train[,4] #Create vector containing ONLY the predictor variable (ie stars) which is in column 4 in "review_data_small2"
 
-
+##5.2 Create the test data (ie the data not in the training data)
+review_test<- review_data_small2[-train,]
+review_x_test<- review_test[,-4]
+review_y_test <- review_test[,4]
 
