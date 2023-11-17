@@ -67,11 +67,53 @@ review_data_small2 = subset(review_data_small, select = -c(5,6,7) )
 
 train <- sample(1:nrow(review_data_small2), 7*nrow(review_data_small2)/8) #split 7/8 and 1/8
 review_train <- review_data_small2[train,]
+
+###5.1.1 Predictor variables in training data 
 review_x_train <- review_train[,-4] #Create data frame, excluding the predictor variable (ie stars) which is in column 4 in "review_data_small2"
+
+###5.1.2 Output variable (stars) in training data
 review_y_train <- review_train[,4] #Create vector containing ONLY the predictor variable (ie stars) which is in column 4 in "review_data_small2"
+
+
 
 ##5.2 Create the test data (ie the data not in the training data)
 review_test<- review_data_small2[-train,]
+
+###5.2.1 Predictor variables in test data 
 review_x_test<- review_test[,-4]
+
+###5.2.2 Output variable (stars) in test data
 review_y_test <- review_test[,4]
+
+
+
+
+
+#6.0 Get a general sense of the words associated with 5-star and 1-star --> using Wordcloud
+
+##6.1 Install and load packages needed to create wordcloud
+install.packages("tm")
+install.packages("wordcloud2")
+install.packages("wordcloud")
+install.packages("RColorBrewer")
+library(tm)
+library(wordcloud2)
+library(wordcloud)
+library(RColorBrewer)
+
+##6.2 Create wordcloud for 5-star ratings
+General5star <- subset(review_data_small2, stars == 5)
+General5star_text <- paste(General5star$text, collapse = " ")
+Worldcloud_5star <- wordcloud(words = strsplit(General5star_text, " ")[[1]], freq = rep(1, length(strsplit(General5star_text, " ")[[1]])))
+wordcloud2(Wordcloud_5star) # Display the word cloud 
+
+
+##6.3 Create wordcloud for 1-star ratings
+General1star <- subset(review_data_small2, stars == 1)
+General1star_text <- paste(General1star$text, collapse = " ")
+Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])))
+wordcloud2(Wordcloud_1star) # Display the word cloud 
+
+
+
 
