@@ -43,7 +43,7 @@ View(business_data)
 
 
 #3.0 View summary of star ratings 
-install.packes("janitor")
+install.packages("janitor")
 library(janitor)
 tabyl(review_data_small$stars, sort=TRUE)
 #Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.3% | 2star: 7.82% | 3star: 9.91% | 4 star: 20.77% | 5star: 46.22%)
