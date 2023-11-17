@@ -24,5 +24,9 @@ cat("\014")
 rm(list=ls())
 
 ###2.4.2 Load the .RDA data (these are the smaller datasets as I couldn't load the big ones)
-review_data <- load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
-user_data <- load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_user_small.Rda")
+
+####2.4.2.1 Load the dataset "review_data_small"
+load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
+
+####2.4.2.1 Load the dataset "user_data_small"
+load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_user_small.Rda")
