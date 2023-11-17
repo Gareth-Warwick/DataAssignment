@@ -14,6 +14,8 @@ set.seed(1)
 cat("\014")  
 rm(list=ls())
 
+
+
 #2.0 Loading the data
 
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
@@ -34,9 +36,21 @@ View(review_data_small)
 View(user_data_small)
 View(business_data)
 
-#3.0 View summary of star ratings 
+
+
+#3.0 Clean the data
+
+#3.1 In review_data_small --> drop columns "useful", "funny", "cool" as these are other users' reactions to consumer i's rating/review --> not relevant
+review_data_small2 = subset(review_data_small, select = -c(5,6,7) )
+
+
+
+#4.0 View summary of star ratings 
 install.packes("janitor")
 library(janitor)
 tabyl(review_data_small$stars, sort=TRUE)
 #Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.3% | 2star: 7.82% | 3star: 9.91% | 4 star: 20.77% | 5star: 46.22%)
 
+#5.0 Split the data
+
+##5.1 Create the test data
