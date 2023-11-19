@@ -54,9 +54,20 @@ View(review_data_small2)
 rm(review_data_small)
 
 
+#5.0 DATA PREPARATION: clean the text
+review_data_small2 <- review_data_small2 |>
+  dplyr::mutate(
+    clean_text = tolower(text), # converts all text in the 'text' column to lowercase -> eliminate case sensitivity and ensure consistent representation of words
+    clean_text = gsub("[']","",clean_text), #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
+    clean_text = gsub ("[[:punct:]]"," ", clean_text), #eliminate all punctuation marks, leaving only whitespace-separated words
+    clean_text = gsub ("[[:space:]]+", " ", clean_text), #replace multiple consecutive white space characters (eg. spaces/abs/newlines) with single spaces, ensuring consistent spacing between words
+    clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
+    
 
 
-#5.0 DATA PREPARATION: Split the data "review_data_small2"
+
+
+#6.0 DATA PREPARATION: Split the data "review_data_small2"
 
 ##5.1 Create the TRAINING data
 
@@ -64,10 +75,10 @@ train <- sample(1:nrow(review_data_small2), 7*nrow(review_data_small2)/8) #split
 review_train <- review_data_small2[train,]
 
 ###5.1.1 Predictor variables in training data 
-review_x_train <- review_train[,5] #Create data frame containing only the predictor variables (text) which is in column 5 in "review_data_small2"
+review_x_train <- review_train[,3] #Create data frame containing only the predictor variables (text) which is in column 3 in the UPDATED "review_data_small2"
 
 ###5.1.2 Output variable (stars) in training data
-review_y_train <- review_train[,4] #Create vector containing ONLY the output (ie stars) which is in column 4 in "review_data_small2"
+review_y_train <- review_train[,1] #Create vector containing ONLY the output (ie stars) which is in column 1 in "review_data_small2"
 
 
 
@@ -75,10 +86,10 @@ review_y_train <- review_train[,4] #Create vector containing ONLY the output (ie
 review_test<- review_data_small2[-train,]
 
 ###5.2.1 Predictor variables in test data 
-review_x_test<- review_test[,5]
+review_x_test<- review_test[,3]
 
 ###5.2.2 Output variable (stars) in test data
-review_y_test <- review_test[,4]
+review_y_test <- review_test[,1]
 
 ##5.3 Clear Memory
 rm(review_test)
@@ -88,14 +99,14 @@ rm(review_data_small2)
 
 
 
-#6.0 DATA PREPARATION: Create tokens from the words appearing in the input corpus --> use the tokens to construct a model
-install.packages("tm")
-library(tm)
+#6.0 DATA PREPARATION: Convert text data into document term matrix in BOTH TRAINING AND TEST
+install.packages("text2vec")
+library(text2vec)
+install.packages("stats")
+library(stats)
 
-##6.1 Creating tokens within TRAINING data
-
-###6.1.1 SCRAPPED Provides the corpus of text data from which the DTM will be constructed -- The corpus is typically represented as a collection of documents, each containing text data
-reviewCorpus <- Corpus(VectorSource(review_x_train$text))
+DTM_x_train <- text2vec_dtm(review_x_train)
+DTM_x_test <- text2vec_dtm(review_x_test)
 
 ###6.1.2 EDITED TO COMBINE CORPUS AND MATRIX CONVERSION - Generates a document text matrix from the provided corpus
 DTM_review_x_train <- as.matrix(DocumentTermMatrix(Corpus(VectorSource(review_x_train))), control = list(
