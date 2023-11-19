@@ -18,7 +18,7 @@ rm(list=ls())
 
 
 
-#2.0 DATA COLLECTION: Loading the data
+#2.0 DATA COLLECTION: Loading the data into computer
 
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
 
