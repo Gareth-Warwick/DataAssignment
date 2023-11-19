@@ -106,11 +106,11 @@ install.packages("text2vec")
 library(text2vec)
 
 ###7.1.1 Define text2vec_dtm function --> converts text string into a Document Term Matrix representing the frequency of words in a text
-text2vec_dtm <- function(text){
-  tokens <- text2vec::itoken(text, sep = " ", xptr = FALSE) ##breaking the text into individual words or tokens
-  vocab <- text2vec::create_vocabulary(tokens) ##extract a unique set of words
-  filtered_words <- unique_words[which(table(unlist(strsplit(tokens, " "))) >= 0.1*length(tokens))] ##Only include words that appear at least 10% of the time
-  dtm <- text2vec::create_dtm(tokens, text2vec::vocab_vectorizer(filtered_words))## Construct DTM using only filtered words
+text2vec_dtm <- function(text) {
+  tokens <- text2vec::itoken(text, sep = " ", xptr = FALSE) ## breaking the text into individual words or tokens
+  vocab <- text2vec::create_vocabulary(tokens) ## extract a special set of words
+  filtered_words <- filtered_words <- tokens[which(table(tokens) >= 0.1 * length(tokens))] ## Only include words that appear at least 10% of the time
+  dtm <- text2vec::create_dtm(tokens, text2vec::vocab_vectorizer(vocabulary = filtered_words)) ## Construct DTM using only filtered words
   return(dtm)}
 
 
