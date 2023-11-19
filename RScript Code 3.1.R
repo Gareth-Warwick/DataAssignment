@@ -69,29 +69,29 @@ review_data_small2 <- review_data_small2 |>
 
 #6.0 DATA PREPARATION: Split the data "review_data_small2"
 
-##5.1 Create the TRAINING data
+##6.1 Create the TRAINING data
 
 train <- sample(1:nrow(review_data_small2), 7*nrow(review_data_small2)/8) #split 7/8 and 1/8
 review_train <- review_data_small2[train,]
 
-###5.1.1 Predictor variables in training data 
+###6.1.1 Predictor variables in training data 
 review_x_train <- review_train[,3] #Create data frame containing only the predictor variables (text) which is in column 3 in the UPDATED "review_data_small2"
 
-###5.1.2 Output variable (stars) in training data
+###6.1.2 Output variable (stars) in training data
 review_y_train <- review_train[,1] #Create vector containing ONLY the output (ie stars) which is in column 1 in "review_data_small2"
 
 
 
-##5.2 Create the TEST data (ie the data not in the training data)
+##6.2 Create the TEST data (ie the data not in the training data)
 review_test<- review_data_small2[-train,]
 
-###5.2.1 Predictor variables in test data 
+###6.2.1 Predictor variables in test data 
 review_x_test<- review_test[,3]
 
-###5.2.2 Output variable (stars) in test data
+###6.2.2 Output variable (stars) in test data
 review_y_test <- review_test[,1]
 
-##5.3 Clear Memory
+##6.3 Clear Memory
 rm(review_test)
 rm(review_train)
 rm(train)
@@ -99,14 +99,29 @@ rm(review_data_small2)
 
 
 
-#6.0 DATA PREPARATION: Convert text data into document term matrix in BOTH TRAINING AND TEST
+#7.0 DATA PREPARATION: Convert text data into document term matrix in BOTH TRAINING AND TEST
+
+##7.1 Install and load required packages
 install.packages("text2vec")
 library(text2vec)
-install.packages("stats")
-library(stats)
 
+###7.1.1 Define text2vec_dtm function --> converts text string into a Document Term Matrix representing the frequency of words in a text
+text2vec_dtm <- function(text){
+  tokens <- text2vec::itoken(text, sep = " ", xptr = FALSE) ##breaking the text into individual words or tokens
+  vocab <- text2vec::create_vocabulary(tokens) ##extract a unique set of words
+  filtered_words <- unique_words[which(table(unlist(strsplit(tokens, " "))) >= 0.1*length(tokens))] ##Only include words that appear at least 10% of the time
+  dtm <- text2vec::create_dtm(tokens, text2vec::vocab_vectorizer(filtered_words))## Construct DTM using only filtered words
+  return(dtm)}
+
+
+
+##7.2 Prepare the data
+
+###7.2.1 Setup the training data
 DTM_x_train <- text2vec_dtm(review_x_train)
-DTM_x_test <- text2vec_dtm(review_x_test)
+
+###7.2.2 Setup the test data
+DTM_x_test <- text2vec_dtm(review_x_test, vocab=filtered_words_test)
 
 ###6.1.2 EDITED TO COMBINE CORPUS AND MATRIX CONVERSION - Generates a document text matrix from the provided corpus
 DTM_review_x_train <- as.matrix(DocumentTermMatrix(Corpus(VectorSource(review_x_train))), control = list(
