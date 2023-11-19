@@ -121,7 +121,7 @@ DTM_review_x_train <- as.matrix(DocumentTermMatrix(Corpus(VectorSource(review_x_
   removeSeparators=TRUE, #remove whitespace separators (eg.tabs and newline characters) --> leave only single spaces between words
   stripWhitespace=TRUE, #removes leading and trailing whitespace from each word
   minWordLength=1, #includes words of any length in the vocabulary, including single-letter words
-  bounds=list(global=c(12233,Inf)))) #specifies that only words appearing in at least one document (lower bound) will be included, with no upper bound (Inf) on document frequency
+  bounds=list(global=c(12233,Inf)))) #specifies that only words appearing in at least 12233 documents (ie repeated at least 12233 times, which is 1% of the training data) will be included, with no upper bound (Inf) on document frequency
 
 ###6.1.3 SCRAPPED Convert DTM (a sparse matrix representation of the training data) into a dense matrix representation where all entries are explicitly stored
 DTM_review_x_train <- as.matrix(vectorizer)
