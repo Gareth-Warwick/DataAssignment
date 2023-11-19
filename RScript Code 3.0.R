@@ -39,6 +39,9 @@ View(user_data_small)
 View(business_data)
 
 
+##2.4 Clear Space in memory
+rm(business_data)
+rm(user_data_small)
 
 
 
@@ -60,6 +63,10 @@ View(review_data_small2)
 
 
 
+##4.2 Clearing Memory
+rm(review_data_small)
+
+
 
 
 #5.0 DATA PREPARATION: Split the data "review_data_small2"
@@ -70,10 +77,10 @@ train <- sample(1:nrow(review_data_small2), 7*nrow(review_data_small2)/8) #split
 review_train <- review_data_small2[train,]
 
 ###5.1.1 Predictor variables in training data 
-review_x_train <- review_train[,-4] #Create data frame, excluding the predictor variable (ie stars) which is in column 4 in "review_data_small2"
+review_x_train <- review_train[,5] #Create data frame containing only the predictor variables (text) which is in column 5 in "review_data_small2"
 
 ###5.1.2 Output variable (stars) in training data
-review_y_train <- review_train[,4] #Create vector containing ONLY the predictor variable (ie stars) which is in column 4 in "review_data_small2"
+review_y_train <- review_train[,4] #Create vector containing ONLY the output (ie stars) which is in column 4 in "review_data_small2"
 
 
 
@@ -81,12 +88,16 @@ review_y_train <- review_train[,4] #Create vector containing ONLY the predictor 
 review_test<- review_data_small2[-train,]
 
 ###5.2.1 Predictor variables in test data 
-review_x_test<- review_test[,-4]
+review_x_test<- review_test[,5]
 
 ###5.2.2 Output variable (stars) in test data
 review_y_test <- review_test[,4]
 
-
+##5.3 Clear Memory
+rm(review_test)
+rm(review_train)
+rm(train)
+rm(review_data_small2)
 
 
 
@@ -94,11 +105,38 @@ review_y_test <- review_test[,4]
 install.packages("tm")
 library(tm)
 
-#provides the corpus of text data from which the DTM will be constructed -- The corpus is typically represented as a collection of documents, each containing text data
+##6.1 Creating tokens within TRAINING data
+
+###6.1.1 SCRAPPED Provides the corpus of text data from which the DTM will be constructed -- The corpus is typically represented as a collection of documents, each containing text data
 reviewCorpus <- Corpus(VectorSource(review_x_train$text))
 
-#generates a document text matrix from the provided corpus
-vectorizer <- DocumentTermMatrix(reviewCorpus, control = list(
+###6.1.2 EDITED TO COMBINE CORPUS AND MATRIX CONVERSION - Generates a document text matrix from the provided corpus
+DTM_review_x_train <- as.matrix(DocumentTermMatrix(Corpus(VectorSource(review_x_train))), control = list(
+  verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
+  stem=TRUE, #convert words to their root form
+  stopwords=TRUE, #removes common stopwords (ie words considered to be less informative for text analysis)
+  asPlain=TRUE, #convert input text into plain text, removing html tags and other formatting)
+  tolower=TRUE, #converts all tags into lower case
+  removePunctuation=TRUE, #remove punctuation
+  removeSeparators=TRUE, #remove whitespace separators (eg.tabs and newline characters) --> leave only single spaces between words
+  stripWhitespace=TRUE, #removes leading and trailing whitespace from each word
+  minWordLength=1, #includes words of any length in the vocabulary, including single-letter words
+  bounds=list(global=c(1,Inf)))) #specifies that only words appearing in at least one document (lower bound) will be included, with no upper bound (Inf) on document frequency
+
+###6.1.3 SCRAPPED Convert DTM (a sparse matrix representation of the training data) into a dense matrix representation where all entries are explicitly stored
+DTM_review_x_train <- as.matrix(vectorizer)
+
+
+
+
+
+##6.2 Creating tokens within TEST data
+
+###6.2.1 Provides the corpus of text data from which the DTM will be constructed -- The corpus is typically represented as a collection of documents, each containing text data
+reviewCorpus_test <- Corpus(VectorSource(review_x_test$text))
+
+###6.2.2 Generates a document text matrix from the provided corpus
+vectorizer_test <- DocumentTermMatrix(reviewCorpus_test, control = list(
   verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
   stem=TRUE, #convert words to their root form
   stopwords=TRUE, #removes common stopwords (ie words considered to be less informative for text analysis)
@@ -111,6 +149,15 @@ vectorizer <- DocumentTermMatrix(reviewCorpus, control = list(
   bounds=list(global=c(1,Inf)))) #specifies that only words appearing in at least one document (lower bound) will be included, with no upper bound (Inf) on document frequency
 
 
+###6.2.3 Convert DTM (a sparse matrix representation of the training data) into a dense matrix representation where all entries are explicitly stored
+DTM_review_x_test <- as.matrix(vectorizer_test)
+
+
+
+
+
+
+#7.0 MODEL 1: Unregularised Linear Regression
 
 
 
