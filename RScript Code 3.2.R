@@ -30,6 +30,9 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 View(review_data_small)
 
 
+##2.4 CREATE SOME SAMPLE RANDOM 
+
+
 
 
 #3.0 DATA UNDERSTANDING: View summary of star ratings 
@@ -42,11 +45,18 @@ tabyl(review_data_small$stars, sort=TRUE)
 
 
 
+
+#4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
+randomsample <- sample(1:nrow(review_data_small), 1*nrow(review_data_small)/2)
+review_data_small2 <- review_data_small[randomsample,]
+
+
+
 #4.0 DATA PREPARATION: Filter the data
 
 ##4.1 In review_data_small --> only extract relevant columns (4-stars // 8-text)
-review_data_small2 = subset(review_data_small, select = c(4,8) )
-View(review_data_small2)
+review_data_small3 <- subset(review_data_small2, select = c(4,8) )
+View(review_data_small3)
 
 
 ##4.2 Clearing Memory
@@ -102,7 +112,7 @@ DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_train)), contr
   stopwords=TRUE, #removes common stopwords (ie words considered to be less informative for text analysis)
   asPlain=TRUE, #convert input text into plain text, removing html tags and other formatting)
   tolower=TRUE, #converts all tags into lower case
-  removePunctuation=TRUE, #remove punctuation
+  removePunctuation=TRUE, #remove punctuations
   removeSeparators=TRUE, #remove whitespace separators (eg.tabs and newline characters) --> leave only single spaces between words
   stripWhitespace=TRUE, #removes leading and trailing whitespace from each word
   minWordLength=1, #includes words of any length in the vocabulary, including single-letter words
