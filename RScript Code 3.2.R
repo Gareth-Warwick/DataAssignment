@@ -30,16 +30,19 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 View(review_data_small)
 
 
-##2.4 CREATE SOME SAMPLE RANDOM 
+##2.4 Remove duplicates
+review_data_clean <- review_data_small %>%
+  filter(!duplicated(text) & text != "")
 
-
+##2.5 Clear Memory
+rm(review_data_small)
 
 
 #3.0 DATA UNDERSTANDING: View summary of star ratings 
 install.packages("janitor")
 library(janitor)
-tabyl(review_data_small$stars, sort=TRUE)
-#Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.3% | 2star: 7.82% | 3star: 9.91% | 4 star: 20.77% | 5star: 46.22%)
+tabyl(review_data_clean$stars, sort=TRUE)
+#Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.28% | 2star: 7.82% | 3star: 9.92% | 4 star: 20.78% | 5star: 46.21%)
 
 
 
@@ -47,12 +50,13 @@ tabyl(review_data_small$stars, sort=TRUE)
 
 
 #4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
-randomsample <- sample(1:nrow(review_data_small), 1*nrow(review_data_small)/2)
-review_data_small2 <- review_data_small[randomsample,]
+randomsample <- sample(1:nrow(review_data_clean), 1*nrow(review_data_clean)/2)
+review_data_small2 <- review_data_clean[randomsample,]
 
 
 #4.1 Clear Memory
 rm(randomsample)
+rm(review_data_clean)
 
 
 #5.0 DATA PREPARATION: Filter the data
@@ -63,7 +67,6 @@ View(review_data_small3)
 
 
 ##5.2 Clearing Memory
-rm(review_data_small)
 rm(review_data_small2)
 
 
@@ -80,15 +83,23 @@ review_data_small3 <- review_data_small3 |>
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
 
-##6.1 Extract the relevant columns
-review_data_small4 <- subset(review_data_small3, select = c(1,2,4) ) #extract out column 1 (review_id), column 2 (stars) and column 4 (clean_text)
+##6.1 Remove duplicate rows with duplicates in clean_text (again)
+review_data_small3clean <- review_data_small3 %>%
+  filter(!duplicated(clean_text) & clean_text != "")
+
+##6.2 Clear memory
+rm(review_data_small3)
+
+##6.3 Extract the relevant columns
+review_data_small4 <- subset(review_data_small3clean, select = c(1,2,4) ) #extract out column 1 (review_id), column 2 (stars) and column 4 (clean_text)
 View(review_data_small4)
 
+##6.4 Clear memory
+rm(review_data_small3clean)
 
 
 
-##6.3 Clear Memory
-rm(review_data_small3)
+
 
 
 
@@ -112,6 +123,9 @@ review_y_train <- review_train[,c(1,2)] #Output Variable: col1->review_id // col
 
 
 ##7.2 Split predictor and output in TEST data
+review_x_test <- review_test[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
+review_y_test <- review_test[,c(1,2)] #Output Variable: col1->review_id // col2->stars
+
 
 
 #8.0 DATA PREPARATION: CONVERT TO TIBBLE 
@@ -121,7 +135,12 @@ install.packages("tidytext")
 library(tidytext)
 
 
+
+
+
+
 ##8.1 TRAINING DATA
+
 
 
 ###8.1.1 TOKENIZE THE TEXT
@@ -129,13 +148,60 @@ library(tidytext)
 tokenized_review_train <- review_train %>%
   unnest_tokens(input = clean_text, output = word)
 
+View(tokenized_review_train)
 
-# Calculate TF-IDF
+
+
+#Check unique id
+unique_review_ids_before <- unique(review_x_train$review_id)
+unique_review_ids_after <- unique(tokenized_review_train$review_id)
+setdiff(unique_review_ids_after, unique_review_ids_before)
+
+
+#start crying
+rm(unique_review_ids_before)
+rm(unique_review_ids_after)
+
+
+##Check whether review_id are unique
+
+review_ids <- gsub(".*(\\d+).*", "\\1", review_x_train$clean_text)
+
+# Count identifier occurrences
+identifier_counts <- as.data.frame(table(review_ids))
+
+# Identify duplicate identifiers
+duplicate_ids <- identifier_counts[identifier_counts$Freq > 1,]$review_id
+
+# Investigate duplicate identifiers
+for (id in duplicate_ids) {
+  duplicate_reviews <- review_x_train[review_x_train$review_id == id, ]
+  print(paste("Review ID:", id))
+  print(paste("Review Text:", duplicate_reviews$clean_text))
+  # Manually examine the review text to determine if it represents a single review or multiple reviews with the same identifier
+}
+
+# Validate identifier format
+invalid_ids <- review_x_train[grepl("[^\\d]", review_ids), ]$review_id
+# Identify any identifiers that deviate from the expected format or appear nonsensical
+
+# Correct or remove invalid identifiers
+# Based on your investigation, correct any invalid identifiers or remove them from the data if they cannot be corrected reliably
+
+# Verify uniqueness
+unique_ids <- length(unique(review_ids))
+if (unique_ids != nrow(review_x_train)) {
+  print("Review identifiers are not unique!")
+}
+
+
+
+### 8.1.2 Calculate TF-IDF
 tfidf_review_train <- tokenized_review_train %>%
-  bind_tf_idf(word, review_id, length(tokenized_review_train))
+  bind_tf_idf(term=word, document=review_id, n=55016803) 
 
 
-
+#Error: Error in tapply(n, documents, sum) : arguments must have same length
 
 
 
