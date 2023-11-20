@@ -132,7 +132,7 @@ tokenized_review_train <- review_train %>%
 
 # Calculate TF-IDF
 tfidf_review_train <- tokenized_review_train %>%
-  bind_tf_idf(word, review_id, length(review_train))
+  bind_tf_idf(word, review_id, length(tokenized_review_train))
 
 
 
