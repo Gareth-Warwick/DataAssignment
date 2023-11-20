@@ -44,7 +44,7 @@ library(janitor)
 tabyl(review_data_clean$stars, sort=TRUE)
 #Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.28% | 2star: 7.82% | 3star: 9.92% | 4 star: 20.78% | 5star: 46.21%)
 
-
+summary(review_data_clean)
 
 
 
