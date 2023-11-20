@@ -51,24 +51,28 @@ randomsample <- sample(1:nrow(review_data_small), 1*nrow(review_data_small)/2)
 review_data_small2 <- review_data_small[randomsample,]
 
 
+#4.1 Clear Memory
+rm(randomsample)
 
-#4.0 DATA PREPARATION: Filter the data
 
-##4.1 In review_data_small --> only extract relevant columns (4-stars // 8-text)
+#5.0 DATA PREPARATION: Filter the data
+
+##5.1 In review_data_small --> only extract relevant columns (4-stars // 8-text)
 review_data_small3 <- subset(review_data_small2, select = c(4,8) )
 View(review_data_small3)
 
 
-##4.2 Clearing Memory
+##5.2 Clearing Memory
 rm(review_data_small)
+rm(review_data_small2)
 
 
 
 
 
 
-#5.0 DATA PREPARATION: clean the text
-review_data_small2 <- review_data_small2 |>
+#6.0 DATA PREPARATION: clean the text
+review_data_small3 <- review_data_small3 |>
   dplyr::mutate(
     clean_text = tolower(text), #converts all text in the 'text' column to lowercase --> eliminate case sensitivity and ensure consistent representation of words
     clean_text = gsub("[']", "", clean_text),  #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
@@ -76,36 +80,34 @@ review_data_small2 <- review_data_small2 |>
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
 
-##5.1 Extract the relevant columns
-review_data_small3 <- subset(review_data_small2, select = c(1,3) ) #extract out column 1 (stars) and column 3 (clean_text)
-View(review_data_small3)
+##6.1 Extract the relevant columns
+review_data_small4 <- subset(review_data_small3, select = c(1,3) ) #extract out column 1 (stars) and column 3 (clean_text)
+View(review_data_small4)
 
-##5.3 Clear Memory
-rm(review_data_small2)
-
-
-
-
-#6.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
-
-train <- sample(1:nrow(review_data_small3), 7*nrow(review_data_small3)/8) #split 7/8 and 1/8
-review_train <- review_data_small3[train,] #Training Data
-review_test<- review_data_small3[-train,] #Test Data
-
-rm(train)
+##6.3 Clear Memory
 rm(review_data_small3)
 
-#7.0 DATA PREPARATION: CONVERT TO TIBBLE 
+
+
+
+#7.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
+train <- sample(1:nrow(review_data_small4), 3*nrow(review_data_small4)/4) #split 3/4 and 1/4
+review_train <- review_data_small4[train,] #Training Data
+review_test<- review_data_small4[-train,] #Test Data
+
+rm(train)
+rm(review_data_small4)
+
+#8.0 DATA PREPARATION: CONVERT TO TIBBLE 
 install.packages("tm")
 library(tm)
 install.packages("tidytext")
 library(tidytext)
 
 
-##7.1 TRAINING DATA
+##8.1 TRAINING DATA
 
-###7.1.1 CONVERT TRAINING DATA TO DTM
-
+###8.1.1 CONVERT TRAINING DATA TO DTM
 DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_train)), control = list(
   verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
   stem=TRUE, #convert words to their root form
@@ -116,21 +118,21 @@ DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_train)), contr
   removeSeparators=TRUE, #remove whitespace separators (eg.tabs and newline characters) --> leave only single spaces between words
   stripWhitespace=TRUE, #removes leading and trailing whitespace from each word
   minWordLength=1, #includes words of any length in the vocabulary, including single-letter words
-  bounds=list(global=c(0.2*length(review_train),Inf)))) #specifies that only words appearing in at least 20% of the time will be included, with no upper bound (Inf) on document frequency
+  bounds=list(global=c(0.1*length(review_train),Inf)))) #specifies that only words appearing in at least 10% of the time will be included, with no upper bound (Inf) on document frequency
 
 
-###7.1.2 CONVERT TRAINING DTM TO TIBBLE
+###8.1.2 CONVERT TRAINING DTM TO TIBBLE
 tibble_review_train <- tidy(DTM_review_train)
 
 
-###7.1.3 CLEAR MEMORY
+###8.1.3 CLEAR MEMORY
 rm(review_train)
 rm(DTM_review_train)
 
 
-##7.2 TEST DATA
+##8.2 TEST DATA
 
-###7.2.1 CONVERT TEST DATA TO DTM
+###8.2.1 CONVERT TEST DATA TO DTM
 DTM_review_test <- DocumentTermMatrix(Corpus(VectorSource(review_test)), control = list(
   verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
   stem=TRUE, #convert words to their root form
@@ -144,11 +146,11 @@ DTM_review_test <- DocumentTermMatrix(Corpus(VectorSource(review_test)), control
   bounds=list(global=c(0.2*length(review_train),Inf)))) #specifies that only words appearing in at least 20% of the time will be included, with no upper bound (Inf) on document frequency
 
 
-###7.2.2 CONVERT TEST DTM TO TIBBLE
+###8.2.2 CONVERT TEST DTM TO TIBBLE
 tibble_review_test <- tidy(DTM_review_test)
 
 
-###7.2.3 CLEAR MEMORY
+###8.2.3 CLEAR MEMORY
 rm(review_test)
 rm(DTM_review_test)
 
