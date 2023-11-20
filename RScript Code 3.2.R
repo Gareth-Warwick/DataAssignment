@@ -57,8 +57,8 @@ rm(randomsample)
 
 #5.0 DATA PREPARATION: Filter the data
 
-##5.1 In review_data_small --> only extract relevant columns (4-stars // 8-text)
-review_data_small3 <- subset(review_data_small2, select = c(4,8) )
+##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
+review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
 View(review_data_small3)
 
 
@@ -81,8 +81,11 @@ review_data_small3 <- review_data_small3 |>
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
 
 ##6.1 Extract the relevant columns
-review_data_small4 <- subset(review_data_small3, select = c(1,3) ) #extract out column 1 (stars) and column 3 (clean_text)
+review_data_small4 <- subset(review_data_small3, select = c(1,2,4) ) #extract out column 1 (review_id), column 2 (stars) and column 4 (clean_text)
 View(review_data_small4)
+
+
+
 
 ##6.3 Clear Memory
 rm(review_data_small3)
@@ -98,6 +101,19 @@ review_test<- review_data_small4[-train,] #Test Data
 rm(train)
 rm(review_data_small4)
 
+
+
+
+##7.1 Split predictor and output in TRAINING data
+
+review_x_train <- review_train[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
+review_y_train <- review_train[,c(1,2)] #Output Variable: col1->review_id // col2->stars
+
+
+
+##7.2 Split predictor and output in TEST data
+
+
 #8.0 DATA PREPARATION: CONVERT TO TIBBLE 
 install.packages("tm")
 library(tm)
@@ -107,8 +123,36 @@ library(tidytext)
 
 ##8.1 TRAINING DATA
 
+
+###8.1.1 TOKENIZE THE TEXT
+
+tokenized_review_train <- review_train %>%
+  unnest_tokens(input = clean_text, output = word)
+
+
+# Calculate TF-IDF
+tfidf_review_train <- tokenized_review_train %>%
+  bind_tf_idf(word, review_id, length(review_train))
+
+
+
+
+
+
+
+###8.1.1 CONVERT TRAINING DATA TO BOW DATA
+
+bowdata_x_train <- review_x_train %>%
+  mutate(text = as.character(clean_text)) %>%
+  mutate(tokens = token_ngrams(clean_text, n = 1)) %>%
+  unnest(tokens) %>%
+  count(review_id, name = "token_count")
+
+
+
+
 ###8.1.1 CONVERT TRAINING DATA TO DTM
-DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_train)), control = list(
+DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_x_train$clean_text)), control = list(
   verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
   stem=TRUE, #convert words to their root form
   stopwords=TRUE, #removes common stopwords (ie words considered to be less informative for text analysis)
@@ -121,9 +165,23 @@ DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_train)), contr
   bounds=list(global=c(0.1*length(review_train),Inf)))) #specifies that only words appearing in at least 10% of the time will be included, with no upper bound (Inf) on document frequency
 
 
-###8.1.2 CONVERT TRAINING DTM TO TIBBLE
-tibble_review_train <- tidy(DTM_review_train)
 
+
+tidy_review_train <- tidy(DTM_review_train)
+merged_tibble_train <- mutate(tidy_review_train, stars = review_y_train)
+
+
+matrix_review_train <- as.matrix(DTM_review_train)
+  
+
+
+tibble_review_train <- cbind(DTM_review_train, review_y_train) #merge stars with predictor
+rm(merged_train)
+
+
+###8.1.2 CONVERT TRAINING DTM TO TIBBLE
+tibble_review_train <- tidy(merged_train)
+rm(tibble_review_train)
 
 ###8.1.3 CLEAR MEMORY
 rm(review_train)
@@ -173,7 +231,7 @@ tibble_y_test <- tibble_review_test [ ,1] #Output (stars)
 
 
 #9.0 MODELLING 1: Unregularised Linear Regression from training data
-Unreg_LinRegr <- lm (stars~term,count, data=tibble_review_train)
+UnregLinRegr_train <- lm (stars~ ., data=merged_train)
 
 
 
