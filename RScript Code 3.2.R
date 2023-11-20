@@ -78,10 +78,11 @@ rm(review_data_small2)
 review_data_small3 <- review_data_small3 |>
   dplyr::mutate(
     clean_text = tolower(text), #converts all text in the 'text' column to lowercase --> eliminate case sensitivity and ensure consistent representation of words
-    clean_text = gsub("[']", "", clean_text),  #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
+    clean_text = gsub("[']", "", clean_text), #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
     clean_text = gsub("[[:punct:]]", " ", clean_text), #eliminate all punctuation marks, such as commas, periods, question marks etc, leaving only whitespace-separated words
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
+
 
 ##6.1 Remove duplicate rows with duplicates in clean_text (again)
 review_data_small3clean <- review_data_small3 %>%
@@ -115,14 +116,14 @@ rm(review_data_small4)
 
 
 
-##7.1 Split predictor and output in TRAINING data
+##SCRAP - 7.1 Split predictor and output in TRAINING data
 
 review_x_train <- review_train[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
 review_y_train <- review_train[,c(1,2)] #Output Variable: col1->review_id // col2->stars
 
 
 
-##7.2 Split predictor and output in TEST data
+##7.2 SCRAP - Split predictor and output in TEST data
 review_x_test <- review_test[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
 review_y_test <- review_test[,c(1,2)] #Output Variable: col1->review_id // col2->stars
 
@@ -144,12 +145,33 @@ library(tidytext)
 
 
 ###8.1.1 TOKENIZE THE TEXT
-
+#Consider filtering out redundant words
 tokenized_review_train <- review_train %>%
   unnest_tokens(input = clean_text, output = word)
 
 View(tokenized_review_train)
 
+
+
+###8.1.2 Remove stopwords
+install.packages("stopwords")
+library(stopwords)
+cleaned_tokenized_train <- tokenized_review_train %>%
+  anti_join(get_stopwords())
+
+###8.1.3 Clear Memory
+rm(tokenized_review_train)
+
+###8.1.3 Count and sort most common words
+cleaned_tokenized_train %>%
+  count(word, sort = TRUE) 
+
+###8.1.4 do something about link word with stars then sort then plot? (https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html & https://cran.r-project.org/web/packages/tidytext/vignettes/tidying_casting.html)
+
+
+
+#This regression too big
+UnRegLR <- lm(stars~word, data=tokenized_review_train)
 
 
 #Check unique id
@@ -196,14 +218,14 @@ if (unique_ids != nrow(review_x_train)) {
 
 
 
-### 8.1.2 Calculate TF-IDF
+### 8.1.2 Calculate TF-IDF (Term frequency and inverse document frequency)
 tfidf_review_train <- tokenized_review_train %>%
   bind_tf_idf(term=word, document=review_id, n=55016803) 
 
 
 #Error: Error in tapply(n, documents, sum) : arguments must have same length
-
-
+### Consider: Split tokenized_review_train --> review_id + stars // review_id + word --> TF-IDF the review_id + word --> join with review_id+stars by=review_id (ie join based on similarity in review_id))
+#Above doesn't seem to work
 
 
 ###8.1.1 CONVERT TRAINING DATA TO BOW DATA
