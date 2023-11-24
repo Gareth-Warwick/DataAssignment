@@ -129,7 +129,7 @@ review_y_test <- review_test[,c(1,2)] #Output Variable: col1->review_id // col2-
 
 
 
-#8.0 DATA PREPARATION: CONVERT TO TIBBLE 
+#8.0 DATA UNDERSTANDING: Visualise the data
 install.packages("tm")
 library(tm)
 install.packages("tidytext")
@@ -140,7 +140,7 @@ library(tidytext)
 
 
 
-##8.1 TRAINING DATA
+##8.1 TRAINING DATA -- Visualise
 
 
 
@@ -159,8 +159,9 @@ library(stopwords)
 cleaned_tokenized_train <- tokenized_review_train %>%
   anti_join(get_stopwords())
 
-###8.1.3 Clear Memory
+###8.1.3 Clear memory
 rm(tokenized_review_train)
+
 
 ###8.1.3 Count and sort most common words
 cleaned_tokenized_train %>%
@@ -180,12 +181,38 @@ train_stars_text_count <- cleaned_tokenized_train %>%
 train_stars_text_count %>%
   filter(n > 0.5*length(cleaned_tokenized_train)) %>%
   mutate(word = reorder(word, n)) %>%
+  slice_max(order_by=n,n=100) %>% #Select the top 100 words 
   ggplot(aes(word, 0.5*length(cleaned_tokenized_train), fill = stars)) +
   geom_col() +
   coord_flip() +
   labs(y = "Contribution to stars rating")
-#Finding: WAIT THE GRAPH IS MESSING UP!! I THINK THE DATA DIDNT CLEAN PROPERLY
+#Finding: Based on the top 100 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
+  #--> In terms of tangible business attributes, "food", "service", "staff", "experience", friendly", "restaurant", "delicious", "fresh" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
 
+
+
+##8.2 Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
+
+
+###8.2.1 Install required packages
+install.packages("quanteda")
+library(quanteda)
+
+###8.2.2 Remove stop words
+
+
+
+###8.2.3 Create a corpus
+corpus_review_train <- corpus(review_train$clean_text, docnames = review_train$review_id)
+summary(corpus_review_train)
+  
+
+
+###8.2.4 Create a Document Term Matrix (this will take a pretty long time)
+DTM_review_train <- dfm(corpus_review_train)
+
+View(DTM_review_train) #View entire DTM
+DTM_review_train #view some features
 
 ### Plot a unregularised linear regression
 
