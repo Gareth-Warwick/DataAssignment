@@ -166,36 +166,74 @@ rm(tokenized_review_train)
 cleaned_tokenized_train %>%
   count(word, sort = TRUE) 
 
+
+###8.1.4 DIDNT USE - Counts the occurrences of words with certain stars. The index parameter divides the text into 80-line segments, creating a more granular analysis of sentiment patterns 
+train_sentiment <- cleaned_tokenized_train %>%
+  count(word, index = line %/% 80, stars) %>%
+  spread(stars, 524000, fill = 0)
+  
+###8.1.5 Count the occurrences of words with specific stars, sort based on frequency
+train_stars_text_count <- cleaned_tokenized_train %>%
+  count(word, stars, sort = TRUE)
+
+###8.1.6 Visualise
+train_stars_text_count %>%
+  filter(n > 0.5*length(cleaned_tokenized_train)) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, 0.5*length(cleaned_tokenized_train), fill = stars)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Contribution to stars rating")
+#Finding: WAIT THE GRAPH IS MESSING UP!! I THINK THE DATA DIDNT CLEAN PROPERLY
+
+
+### Plot a unregularised linear regression
+
+
+
+#Try sort by count word WITHIN 5 stars?
+
 ###8.1.4 do something about link word with stars then sort then plot? (https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html & https://cran.r-project.org/web/packages/tidytext/vignettes/tidying_casting.html)
 
 
 
-#This regression too big
+
+
+
+
+
+
+
+
+
+
+
+#SCRAPPED - This regression too big
 UnRegLR <- lm(stars~word, data=tokenized_review_train)
 
 
-#Check unique id
+#SCRAPPED - Check unique id
 unique_review_ids_before <- unique(review_x_train$review_id)
 unique_review_ids_after <- unique(tokenized_review_train$review_id)
 setdiff(unique_review_ids_after, unique_review_ids_before)
 
 
-#start crying
+#SCRAPPED - start crying
 rm(unique_review_ids_before)
 rm(unique_review_ids_after)
 
 
-##Check whether review_id are unique
+## SCRAPPEDCheck whether review_id are unique
 
 review_ids <- gsub(".*(\\d+).*", "\\1", review_x_train$clean_text)
 
-# Count identifier occurrences
+# SCRAPPED Count identifier occurrences
 identifier_counts <- as.data.frame(table(review_ids))
 
-# Identify duplicate identifiers
+# SCRAPPED Identify duplicate identifiers
 duplicate_ids <- identifier_counts[identifier_counts$Freq > 1,]$review_id
 
-# Investigate duplicate identifiers
+# SCRAPPED Investigate duplicate identifiers
 for (id in duplicate_ids) {
   duplicate_reviews <- review_x_train[review_x_train$review_id == id, ]
   print(paste("Review ID:", id))
@@ -203,14 +241,14 @@ for (id in duplicate_ids) {
   # Manually examine the review text to determine if it represents a single review or multiple reviews with the same identifier
 }
 
-# Validate identifier format
+# SCRAPPED Validate identifier format
 invalid_ids <- review_x_train[grepl("[^\\d]", review_ids), ]$review_id
-# Identify any identifiers that deviate from the expected format or appear nonsensical
+# SCRAPPED Identify any identifiers that deviate from the expected format or appear nonsensical
 
-# Correct or remove invalid identifiers
-# Based on your investigation, correct any invalid identifiers or remove them from the data if they cannot be corrected reliably
+# SCRAPPED Correct or remove invalid identifiers
+# SCRAPPED Based on your investigation, correct any invalid identifiers or remove them from the data if they cannot be corrected reliably
 
-# Verify uniqueness
+# SCRAPPED Verify uniqueness
 unique_ids <- length(unique(review_ids))
 if (unique_ids != nrow(review_x_train)) {
   print("Review identifiers are not unique!")
@@ -218,7 +256,7 @@ if (unique_ids != nrow(review_x_train)) {
 
 
 
-### 8.1.2 Calculate TF-IDF (Term frequency and inverse document frequency)
+### SCRAPPED 8.1.2 Calculate TF-IDF (Term frequency and inverse document frequency)
 tfidf_review_train <- tokenized_review_train %>%
   bind_tf_idf(term=word, document=review_id, n=55016803) 
 
@@ -228,7 +266,7 @@ tfidf_review_train <- tokenized_review_train %>%
 #Above doesn't seem to work
 
 
-###8.1.1 CONVERT TRAINING DATA TO BOW DATA
+###SCRAPPED 8.1.1 CONVERT TRAINING DATA TO BOW DATA
 
 bowdata_x_train <- review_x_train %>%
   mutate(text = as.character(clean_text)) %>%
@@ -239,7 +277,7 @@ bowdata_x_train <- review_x_train %>%
 
 
 
-###8.1.1 CONVERT TRAINING DATA TO DTM
+###SCRAPPED 8.1.1 CONVERT TRAINING DATA TO DTM
 DTM_review_train <- DocumentTermMatrix(Corpus(VectorSource(review_x_train$clean_text)), control = list(
   verbose=TRUE, #enables verbose output, providing detailed information about the preprocessing steps
   stem=TRUE, #convert words to their root form
