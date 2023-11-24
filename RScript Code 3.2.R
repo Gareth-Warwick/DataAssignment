@@ -81,6 +81,7 @@ review_data_small3 <- review_data_small3 |>
     clean_text = gsub("[']", "", clean_text), #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
     clean_text = gsub("[[:punct:]]", " ", clean_text), #eliminate all punctuation marks, such as commas, periods, question marks etc, leaving only whitespace-separated words
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
+    clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
 
 
@@ -191,28 +192,74 @@ train_stars_text_count %>%
 
 
 
-##8.2 Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
+##9.0 Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
 
 
-###8.2.1 Install required packages
+##9.1 Install required packages
 install.packages("quanteda")
 library(quanteda)
 
-###8.2.2 Remove stop words
 
 
-
-###8.2.3 Create a corpus
+##9.2 Create a corpus
 corpus_review_train <- corpus(review_train$clean_text, docnames = review_train$review_id)
 summary(corpus_review_train)
   
+##9.3 Token
+token_review_train <- tokens(corpus_review_train)
+
+##9.4 Create a Document Term Matrix (this will take a pretty long time)
+DTM_review_train <- dfm(token_review_train) %>%
+  dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the "stopwords-iso lexicon
+
+##9.5 Remove stopwords
+Clean_DTM_review_train <- dfm_remove(DTM_review_train)
 
 
-###8.2.4 Create a Document Term Matrix (this will take a pretty long time)
-DTM_review_train <- dfm(corpus_review_train)
+##9.6 Trim DFM
+Trim_DTM_review_train <- dfm_trim(Clean_DTM_review_train, min_docfreq = 0.05, docfreq_type = "prop") #remove features that appear in less than 5% of the reviews
 
-View(DTM_review_train) #View entire DTM
-DTM_review_train #view some features
+View(Trim_DTM_review_train) #View entire DTM
+Trim_DTM_review_train #view some features
+
+
+##9.7 Clear Memory
+rm(corpus_review_train)
+rm(token_review_train)
+rm(DTM_review_train)
+rm(Clean_DTM_review_train)
+
+
+
+
+
+
+#10.0 Create matrix 
+
+##10.1 Convert DFM into a matrix containing only predictors (ie features and words)
+Matrix_DTM_review_train <- as.matrix(Trim_DTM_review_train) #IT WORKSSSSSSSSS
+
+##10.2 Acquire vector containing output (stars) from original training dataset "review_train"
+stars_review_train <- subset(review_train, select = c(2))
+
+##10.3 Join output with predictors
+Matrix_review_train <- cbind(stars_review_train,Matrix_DTM_review_train)
+
+
+##10.4 Clear Memory
+rm(Matrix_DTM_review_train)
+rm(stars_review_train)
+rm(Trim_DTM_review_train)
+
+
+
+
+
+
+#11.0 MODELLING 1: Unregularised Linear Regression
+
+
+
 
 ### Plot a unregularised linear regression
 
