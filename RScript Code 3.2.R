@@ -30,7 +30,7 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 View(review_data_small)
 
 
-##2.4 Remove duplicates
+##2.4 Remove duplicates and empty text
 review_data_clean <- review_data_small %>%
   filter(!duplicated(text) & text != "")
 
@@ -59,12 +59,15 @@ rm(randomsample)
 rm(review_data_clean)
 
 
+
+
+
+
 #5.0 DATA PREPARATION: Filter the data
 
 ##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
 review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
 View(review_data_small3)
-
 
 ##5.2 Clearing Memory
 rm(review_data_small2)
@@ -83,7 +86,6 @@ review_data_small3 <- review_data_small3 |>
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
     clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
-
 
 ##6.1 Remove duplicate rows with duplicates in clean_text (again)
 review_data_small3clean <- review_data_small3 %>%
@@ -106,6 +108,7 @@ rm(review_data_small3clean)
 
 
 
+
 #7.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
 train <- sample(1:nrow(review_data_small4), 3*nrow(review_data_small4)/4) #split 3/4 and 1/4
 review_train <- review_data_small4[train,] #Training Data
@@ -117,16 +120,6 @@ rm(review_data_small4)
 
 
 
-##SCRAP - 7.1 Split predictor and output in TRAINING data
-
-review_x_train <- review_train[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
-review_y_train <- review_train[,c(1,2)] #Output Variable: col1->review_id // col2->stars
-
-
-
-##7.2 SCRAP - Split predictor and output in TEST data
-review_x_test <- review_test[,c(1,3)] #Predictor Variables: col1 ->review_id // col3_cleantext
-review_y_test <- review_test[,c(1,2)] #Output Variable: col1->review_id // col2->stars
 
 
 
@@ -138,11 +131,7 @@ library(tidytext)
 
 
 
-
-
-
 ##8.1 TRAINING DATA -- Visualise
-
 
 
 ###8.1.1 TOKENIZE THE TEXT
@@ -153,12 +142,12 @@ tokenized_review_train <- review_train %>%
 View(tokenized_review_train)
 
 
-
 ###8.1.2 Remove stopwords
 install.packages("stopwords")
 library(stopwords)
 cleaned_tokenized_train <- tokenized_review_train %>%
   anti_join(get_stopwords())
+
 
 ###8.1.3 Clear memory
 rm(tokenized_review_train)
@@ -167,18 +156,12 @@ rm(tokenized_review_train)
 ###8.1.3 Count and sort most common words
 cleaned_tokenized_train %>%
   count(word, sort = TRUE) 
-
-
-###8.1.4 DIDNT USE - Counts the occurrences of words with certain stars. The index parameter divides the text into 80-line segments, creating a more granular analysis of sentiment patterns 
-train_sentiment <- cleaned_tokenized_train %>%
-  count(word, index = line %/% 80, stars) %>%
-  spread(stars, 524000, fill = 0)
   
-###8.1.5 Count the occurrences of words with specific stars, sort based on frequency
+###8.1.4 Count the occurrences of words with specific stars, sort based on frequency
 train_stars_text_count <- cleaned_tokenized_train %>%
   count(word, stars, sort = TRUE)
 
-###8.1.6 Visualise
+###8.1.5 Visualise
 train_stars_text_count %>%
   filter(n > 0.5*length(cleaned_tokenized_train)) %>%
   mutate(word = reorder(word, n)) %>%
@@ -192,14 +175,12 @@ train_stars_text_count %>%
 
 
 
-##9.0 Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
 
+##9.0 DATA PREPARATION: [Training Data] Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
 
 ##9.1 Install required packages
 install.packages("quanteda")
 library(quanteda)
-
-
 
 ##9.2 Create a corpus
 corpus_review_train <- corpus(review_train$clean_text, docnames = review_train$review_id)
@@ -234,7 +215,7 @@ rm(Clean_DTM_review_train)
 
 
 
-#10.0 Create matrix 
+#10.0 DATA PREPARATION: [Training Data] Create matrix 
 
 ##10.1 Convert DFM into a matrix containing only predictors (ie features and words)
 Matrix_DTM_review_train <- as.matrix(Trim_DTM_review_train) #IT WORKSSSSSSSSS
@@ -245,18 +226,86 @@ stars_review_train <- subset(review_train, select = c(2))
 ##10.3 Join output with predictors
 Matrix_review_train <- cbind(stars_review_train,Matrix_DTM_review_train)
 
-
 ##10.4 Clear Memory
 rm(Matrix_DTM_review_train)
 rm(stars_review_train)
-rm(Trim_DTM_review_train)
 
 
 
 
 
 
-#11.0 MODELLING 1: Unregularised Linear Regression
+
+#11.0 MODELLING 1: [Training Data] Unregularised Linear Regression
+
+##11.1 Construct Linear Regression of "stars" against "features"
+lm_unreg_train_stars <- lm(stars~ . , data = Matrix_review_train) #Create the linear regression
+
+##11.2 Review results 
+summary(lm_unreg_train_stars) 
+
+
+
+
+
+
+#12.0 DATA PREPARATION: [Test Data] Create a Document Term Matrix (go back to "review_test", but remember to remove stop words here)
+
+
+##12.1 Create a corpus
+corpus_review_test <- corpus(review_test$clean_text, docnames = review_test$review_id)
+summary(corpus_review_test)
+
+##12.2 Token
+token_review_test <- tokens(corpus_review_test)
+
+##12.3 Create a Document Term Matrix (this will take a pretty long time)
+DTM_review_test <- dfm(token_review_test) %>%
+  dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the "stopwords-iso lexicon
+
+##12.4 Remove stopwords
+Clean_DTM_review_test <- dfm_remove(DTM_review_test)
+
+
+##12.5 Trim DFM such that it has the same features as training DFM
+Trim_DTM_review_test <- dfm_match(Clean_DTM_review_test, featnames(Trim_DTM_review_train))
+
+
+View(Trim_DTM_review_test) #View entire DTM
+Trim_DTM_review_test #view some features
+
+
+##12.6 Clear Memory
+rm(corpus_review_test)
+rm(token_review_test)
+rm(DTM_review_test)
+rm(Clean_DTM_review_test)
+
+
+
+
+
+
+#13.0 DATA PREPARATION: [Test Data] Create matrix 
+
+##13.1 Convert DFM into a matrix containing only predictors (ie features and words)
+Matrix_DTM_review_test <- as.matrix(Trim_DTM_review_test) #IT WORKSSSSSSSSS
+
+##13.2 Acquire vector containing output (stars) from original test dataset "review_test"
+stars_review_test <- subset(review_test, select = c(2))
+
+##13.3 Join output with predictors
+Matrix_review_test <- cbind(stars_review_test,Matrix_DTM_review_test)
+
+##13.4 Clear Memory
+rm(Matrix_DTM_review_test)
+rm(stars_review_test)
+rm(Trim_DTM_review_test)
+
+
+
+
+
 
 
 
