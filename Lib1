@@ -240,6 +240,19 @@ summary(linreg_unreg_train)
 
 
 
+#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+
+##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
+linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
+
+##12.2 Calculate empirical Mean Squared Error in the TEST data
+linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
+#Finding: Mean Squared Error = 1.600 --> too large --> there is a problem with this model --> proceed to new model
+
+
+
+
+
 
 
 
