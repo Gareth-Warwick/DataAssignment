@@ -114,14 +114,14 @@ library(tidytext)
 tokenized_review <- review_data_small4 %>%
   unnest_tokens(input = clean_text, output = word)
 
-View(tokenized_review)
+View(tokenized_review) #View the tokens
 
 ##7.3 Remove stopwords
 install.packages("stopwords")
 library(stopwords)
 cleaned_tokenized_review <- tokenized_review %>%
   anti_join(get_stopwords()) %>%
-  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords that are found in the "stopwords-iso" lexicon
+  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made lexicon called "stopwords-iso" 
 
 ##7.4 Clear memory
 rm(tokenized_review)
@@ -174,7 +174,7 @@ Clean_DFM_review <- dfm_remove(DFM_review)
 ##8.6 Trim DFM
 Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.05, docfreq_type = "prop") #remove features that appear in less than 5% of the reviews
 
-View(Trim_DFM_review) #View entire DTM
+View(Trim_DFM_review) #View entire DFM
 Trim_DFM_review #view some features
 
 
@@ -199,10 +199,16 @@ stars_review <- subset(review_data_small4, select = c(2))
 Matrix_review <- cbind(stars_review,Matrix_DFM_review)
 
 
-##9.4 Clear Memory
+##9.4 Clean matrix by deleting 2nd column which contained the predictor variable "stars" as this is unlikely to give significant prediction, and instead complicates things due to it bearing the same name as output variable
+Matrix_review2 <- subset(Matrix_review, select = c(-2))
+
+View(Matrix_review2)
+
+##9.5 Clear Memory
 rm(Matrix_DFM_review)
 rm(stars_review)
 rm(Trim_DFM_review)
+rm(Matrix_review)
 
 
 
@@ -211,26 +217,31 @@ rm(Trim_DFM_review)
 
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
-train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
-review_train <- Matrix_review[train,] #Training Data
-review_test<- Matrix_review[-train,] #Test Data
+train <- sample(1:nrow(Matrix_review2), 3*nrow(Matrix_review2)/4) #split 3/4 and 1/4
+review_train <- Matrix_review2[train,] #Training Data
+review_test<- Matrix_review2[-train,] #Test Data
 
 ##10.1 Clear Memory
 rm(train)
 rm(review_data_small4)
+rm(Matrix_review2)
+
+
+
+
+#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+
+##11.1 Construct linear regression of "stars" against "features"
+linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
+
+##11.2 Review results and coefficients
+summary(linreg_unreg_train)
 
 
 
 
 
 
-
-#11.0 MODELLING 1: Unregularised Linear Regression
-
-
-
-
-### Plot a unregularised linear regression
 
 
 
