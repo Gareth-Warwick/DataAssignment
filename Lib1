@@ -393,7 +393,7 @@ model_performance <- review_test %>%
 
 
 
-#19.0 Repeat MODELLING 4: [TRAINING DATA] Regression Tree
+#19.0 Repeat MODELLING 4: [TRAINING DATA] Regression Decision Tree
 
 ##19.1 Install required packages
 install.packages("tree")
@@ -411,7 +411,26 @@ rpart_tree <- rpart(stars ~ ., data=review_train)
 rpart.plot(rpart_tree)
 
 
+#20.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
 
+##20.1 Make predictions and add to the test data
+regression_tree_prediction <- predict(rpart_tree,new_data=review_test) %>% 
+  cbind(review_test)
+View(regression_tree_prediction)
+
+##20.2 Evaluating Performance
+
+###20.2.1 Evaluating using mae (Mean Absolute Error)
+regression_tree_performance_mae <- mae(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_mae)
+#Finding: estimate = 1.355557
+
+###20.2.2 Evaluating using rmse (Root Mean Squared Error)
+regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_rmse)
+#Finding: estimate = 1.633423
 
 
 
