@@ -23,14 +23,14 @@ rm(list=ls())
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
 
 ###2.1.1 Load the dataset "review_data_small"
-load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
+load("//needlenose.ads.warwick.ac.uk/user60/u/u2100906/Desktop/yelp_review_small.Rda")
 
 
 ##2.3 View all the data (note the capital letter for "View" command)
 View(review_data_small)
 
 
-##2.4 Remove duplicates and empty text
+##2.4 Remove duplicates
 review_data_clean <- review_data_small %>%
   filter(!duplicated(text) & text != "")
 
@@ -59,15 +59,12 @@ rm(randomsample)
 rm(review_data_clean)
 
 
-
-
-
-
 #5.0 DATA PREPARATION: Filter the data
 
 ##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
 review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
 View(review_data_small3)
+
 
 ##5.2 Clearing Memory
 rm(review_data_small2)
@@ -87,6 +84,7 @@ review_data_small3 <- review_data_small3 |>
     clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
 
+
 ##6.1 Remove duplicate rows with duplicates in clean_text (again)
 review_data_small3clean <- review_data_small3 %>%
   filter(!duplicated(clean_text) & clean_text != "")
@@ -103,204 +101,126 @@ rm(review_data_small3clean)
 
 
 
+#7.0 DATA UNDERSTANDING
 
-
-
-
-
-
-#7.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
-train <- sample(1:nrow(review_data_small4), 3*nrow(review_data_small4)/4) #split 3/4 and 1/4
-review_train <- review_data_small4[train,] #Training Data
-review_test<- review_data_small4[-train,] #Test Data
-
-rm(train)
-rm(review_data_small4)
-
-
-
-
-
-
-
-#8.0 DATA UNDERSTANDING: Visualise the data
+##7.1 Install required packages
 install.packages("tm")
 library(tm)
 install.packages("tidytext")
 library(tidytext)
 
-
-
-##8.1 TRAINING DATA -- Visualise
-
-
-###8.1.1 TOKENIZE THE TEXT
+##7.2 TOKENIZE THE TEXT
 #Consider filtering out redundant words
-tokenized_review_train <- review_train %>%
+tokenized_review <- review_data_small4 %>%
   unnest_tokens(input = clean_text, output = word)
 
-View(tokenized_review_train)
+View(tokenized_review) #View the tokens
 
-
-###8.1.2 Remove stopwords
+##7.3 Remove stopwords
 install.packages("stopwords")
 library(stopwords)
-cleaned_tokenized_train <- tokenized_review_train %>%
-  anti_join(get_stopwords())
+cleaned_tokenized_review <- tokenized_review %>%
+  anti_join(get_stopwords()) %>%
+  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made lexicon called "stopwords-iso" 
+
+##7.4 Clear memory
+rm(tokenized_review)
 
 
-###8.1.3 Clear memory
-rm(tokenized_review_train)
-
-
-###8.1.3 Count and sort most common words
-cleaned_tokenized_train %>%
+##7.5 Count and sort most common words
+cleaned_tokenized_review %>%
   count(word, sort = TRUE) 
-  
-###8.1.4 Count the occurrences of words with specific stars, sort based on frequency
-train_stars_text_count <- cleaned_tokenized_train %>%
+
+##7.6 Count the occurrences of words with specific stars, sort based on frequency
+overall_stars_text_count <- cleaned_tokenized_review %>%
   count(word, stars, sort = TRUE)
 
-###8.1.5 Visualise
-train_stars_text_count %>%
-  filter(n > 0.5*length(cleaned_tokenized_train)) %>%
+View(overall_stars_text_count)
+
+##7.7 Visualise
+overall_stars_text_count %>%
+  filter(n > 0.5*length(cleaned_tokenized_review)) %>%
   mutate(word = reorder(word, n)) %>%
   slice_max(order_by=n,n=100) %>% #Select the top 100 words 
-  ggplot(aes(word, 0.5*length(cleaned_tokenized_train), fill = stars)) +
+  ggplot(aes(word, 0.5*length(cleaned_tokenized_review), fill = stars)) +
   geom_col() +
   coord_flip() +
   labs(y = "Contribution to stars rating")
 #Finding: Based on the top 100 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
-  #--> In terms of tangible business attributes, "food", "service", "staff", "experience", friendly", "restaurant", "delicious", "fresh" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
+#--> In terms of tangible business attributes, "food", "service", "staff", friendly", "delicious", "restaurant", "experience" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
 
 
+#8.0 DATA PREPARATION -- Create a Document Feature Matrix (go back to "review_train_small4", but remember to remove stop words here)
 
 
-##9.0 DATA PREPARATION: [Training Data] Create a Document Term Matrix (go back to "review_train", but remember to remove stop words here)
-
-##9.1 Install required packages
+##8.1 Install required packages
 install.packages("quanteda")
 library(quanteda)
 
-##9.2 Create a corpus
-corpus_review_train <- corpus(review_train$clean_text, docnames = review_train$review_id)
-summary(corpus_review_train)
-  
-##9.3 Token
-token_review_train <- tokens(corpus_review_train)
+##8.2 Create a corpus
+corpus_review <- corpus(review_data_small4$clean_text, docnames = review_data_small4$review_id)
+summary(corpus_review)
 
-##9.4 Create a Document Term Matrix (this will take a pretty long time)
-DTM_review_train <- dfm(token_review_train) %>%
+##8.3 Tokenise the text
+token_review <- tokens(corpus_review)
+
+##8.4 Create a Document Feature Matrix (this will take a pretty long time)
+DFM_review <- dfm(token_review) %>%
   dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the "stopwords-iso lexicon
 
-##9.5 Remove stopwords
-Clean_DTM_review_train <- dfm_remove(DTM_review_train)
+##8.5 Remove stopwords
+Clean_DFM_review <- dfm_remove(DFM_review)
+
+##8.6 Trim DFM
+Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.05, docfreq_type = "prop") #remove features that appear in less than 5% of the reviews
+
+View(Trim_DFM_review) #View entire DFM
+Trim_DFM_review #view some features
 
 
-##9.6 Trim DFM
-Trim_DTM_review_train <- dfm_trim(Clean_DTM_review_train, min_docfreq = 0.05, docfreq_type = "prop") #remove features that appear in less than 5% of the reviews
-
-View(Trim_DTM_review_train) #View entire DTM
-Trim_DTM_review_train #view some features
-
-
-##9.7 Clear Memory
-rm(corpus_review_train)
-rm(token_review_train)
-rm(DTM_review_train)
-rm(Clean_DTM_review_train)
-
-
-
+##8.7 Clear Memory
+rm(corpus_review)
+rm(token_review)
+rm(DFM_review)
+rm(Clean_DFM_review)
+#Keep Trim_DFM_review for now
 
 
 
-#10.0 DATA PREPARATION: [Training Data] Create matrix 
+#9.0 DATA PREPARATION -- Create Matrix 
 
-##10.1 Convert DFM into a matrix containing only predictors (ie features and words)
-Matrix_DTM_review_train <- as.matrix(Trim_DTM_review_train) #IT WORKSSSSSSSSS
+##9.1 Convert DFM into a matrix containing only predictors (ie features and words)
+Matrix_DFM_review <- as.matrix(Trim_DFM_review) #IT WORKSSSSSSSSS
 
-##10.2 Acquire vector containing output (stars) from original training dataset "review_train"
-stars_review_train <- subset(review_train, select = c(2))
-
-##10.3 Join output with predictors
-Matrix_review_train <- cbind(stars_review_train,Matrix_DTM_review_train)
-
-##10.4 Clear Memory
-rm(Matrix_DTM_review_train)
-rm(stars_review_train)
+##9.2 Acquire vector containing output (stars) from original training dataset "review_data_small4"
+stars_review <- subset(review_data_small4, select = c(2))
 
 
 
+##9.3 Join output with predictors
+Matrix_review <- cbind(stars_review,Matrix_DFM_review)
+View(Matrix_review)
+#Output: A 698664 x 59 matrix
+
+##9.4 Inspect matrix and clean accordingly
+
+###9.4.1 Clean matrix by deleting 2nd column which contained the predictor variable "stars" as this is unlikely to give significant information, and instead complicates things due to it bearing the same name as output variable
+Matrix_review2 <- subset(Matrix_review, select = c(-2))
+View(Matrix_review2)
+#Output: A 698664 x 58 matrix
+
+###9.4.2 Clean matrix by deleting 54th column which contained the predictor variable "stars.1" as this yields no significant information
+Matrix_review3 <- subset(Matrix_review2, select = c(-54))
+View(Matrix_review3)
+#Output: A 698664 x 57 matrix
 
 
-
-
-#11.0 MODELLING 1: [Training Data] Unregularised Linear Regression
-
-##11.1 Construct Linear Regression of "stars" against "features"
-lm_unreg_train_stars <- lm(stars~ . , data = Matrix_review_train) #Create the linear regression
-
-##11.2 Review results 
-summary(lm_unreg_train_stars) 
-
-
-
-
-
-
-#12.0 DATA PREPARATION: [Test Data] Create a Document Term Matrix (go back to "review_test", but remember to remove stop words here)
-
-
-##12.1 Create a corpus
-corpus_review_test <- corpus(review_test$clean_text, docnames = review_test$review_id)
-summary(corpus_review_test)
-
-##12.2 Token
-token_review_test <- tokens(corpus_review_test)
-
-##12.3 Create a Document Term Matrix (this will take a pretty long time)
-DTM_review_test <- dfm(token_review_test) %>%
-  dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the "stopwords-iso lexicon
-
-##12.4 Remove stopwords
-Clean_DTM_review_test <- dfm_remove(DTM_review_test)
-
-
-##12.5 Trim DFM such that it has the same features as training DFM (ref step 9.6)
-Trim_DTM_review_test <- dfm_match(Clean_DTM_review_test, featnames(Trim_DTM_review_train))
-
-
-View(Trim_DTM_review_test) #View entire DTM
-Trim_DTM_review_test #view some features
-
-
-##12.6 Clear Memory
-rm(corpus_review_test)
-rm(token_review_test)
-rm(DTM_review_test)
-rm(Clean_DTM_review_test)
-
-
-
-
-
-
-#13.0 DATA PREPARATION: [Test Data] Create matrix 
-
-##13.1 Convert DFM into a matrix containing only predictors (ie features and words)
-Matrix_DTM_review_test <- as.matrix(Trim_DTM_review_test) #IT WORKSSSSSSSSS
-
-##13.2 Acquire vector containing output (stars) from original test dataset "review_test"
-stars_review_test <- subset(review_test, select = c(2))
-
-##13.3 Join output with predictors
-Matrix_review_test <- cbind(stars_review_test,Matrix_DTM_review_test)
-
-##13.4 Clear Memory
-rm(Matrix_DTM_review_test)
-rm(stars_review_test)
-rm(Trim_DTM_review_test)
+##9.5 Clear Memory
+rm(Matrix_DFM_review)
+rm(stars_review)
+rm(Trim_DFM_review)
+rm(Matrix_review)
+rm(Matrix_review2)
 
 
 
@@ -308,9 +228,212 @@ rm(Trim_DTM_review_test)
 
 
 
+#10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
+train <- sample(1:nrow(Matrix_review3), 3*nrow(Matrix_review3)/4) #split 3/4 and 1/4
+review_train <- Matrix_review3[train,] #Training Data
+review_test<- Matrix_review3[-train,] #Test Data
+
+##10.1 Clear Memory
+rm(train)
+rm(review_data_small4)
+rm(Matrix_review3)
+
+##10.2 Within TRAINING data, split into predictors and output (stars)
+review_train_predictors <- review_train[,-1]
+review_train_stars <- review_train[,1]
+
+##10.3 Within TEST data, split into predictors and output (stars)
+review_test_predictors <- review_test[,-1]
+review_test_stars <- review_test[,1]
 
 
-### Plot a unregularised linear regression
+
+
+#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+
+##11.1 Construct linear regression of "stars" against "features"
+linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
+
+##11.2 Review results and coefficients
+summary(linreg_unreg_train)
+
+
+
+
+#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+
+##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
+linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
+
+##12.2 Calculate empirical Mean Squared Error in the TEST data
+linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
+#Finding: Mean Squared Error = 1.60279657547768 --> greater than 1 --> too large --> there is a problem with this model --> proceed to new model
+
+
+
+
+
+
+#13.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##13.1 Install required packages
+install.packages("glmnet")
+library(glmnet)
+
+##13.2 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+cv.out.ridge <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=0, nfolds=10)
+plot(cv.out.ridge)
+lambda_ridge_cv <- cv.out.ridge$lambda.min #choose lambda that minimises empirial MSE in training data set
+
+##13.3 Estimate Ridge with lambda chosen by Cross Validation
+ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda=lambda_ridge_cv, thresh=1e-12)
+
+summary(ridge.mod)
+
+
+
+
+#14.0 MODEL EVALUATION 2: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##14.1 Fit on test data
+ridge.pred <- predict(ridge.mod, s=lambda_ridge_cv, newx=as.matrix(review_test_predictors))
+ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
+#Finding: Mean Squared Error = 1.60262661888015 --> greater than 1 --> too large --> there is a problem with this model
+
+
+
+
+
+#15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
+
+#15.1 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+cv.out.LASSO <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=1, nfolds=10)
+plot(cv.out.LASSO)
+lambda_LASSO_cv <- cv.out.LASSO$lambda.min #choose lambda that minimises empirial MSE in training data set
+
+##15.2 Estimate LASSO with lambda chosen by Cross Validation
+LASSO.mod <- glmnet(review_train_predictors, review_train_stars, alpha=1, lambda=lambda_LASSO_cv, thresh=1e-12)
+
+summary(LASSO.mod)
+
+
+
+
+
+
+
+#16.0 MODEL EVALUATION 3: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##16.1 Fit on test data
+LASSO.pred <- predict(LASSO.mod, s=lambda_LASSO_cv, newx=as.matrix(review_test_predictors))
+LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
+#Finding: Mean Squared Error = 1.60277113029859 --> greater than 1 --> too large --> there is a problem with this model
+#Nonetheless, since LASSO_MSE = 1.60277113029859 > ridge_MSE = 1.60262661888015, ridge is a better regression in this case, though both are quite bad
+
+
+
+
+
+
+#17.0 MODELLING 4: [TRAINING DATA] Regression Decision Tree 
+
+##17.1 Install required packages
+install.packages("tidymodels")
+library(tidymodels)
+
+##17.2 SCRAPPED - Convert output variable (stars) from numeric into a factor variable
+
+###17.2.1 SCRAPPED- Extract output (stars) from training data
+review_train_stars <- subset(review_train, select = c(1))
+review_train_predictors <- subset(review_train, select=c(-1))
+
+###17.2.2 SCRAPPED- Convert stars into factor from numeric
+review_train_stars2 <- factor(review_train_stars, levels=1:5)
+
+###17.2.3 SCRAPPED- Combine factor stars with predictors
+review_train_factor_stars <- cbind(review_train_stars2,review_train_predictors)
+View(review_train_factor_stars)
+
+
+
+
+##17.2 SCRAPPED- Convert matrix into factors
+review_train2 <- factor(review_train, levels=0:50)
+
+
+
+
+##17.2 Create a decision tree model specification
+tree_spec <- decision_tree()%>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+##17.3 Fit model to the training data
+tree_fit <- tree_spec %>%
+  fit(stars ~ . , data=review_train)
+
+
+
+
+#18.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
+
+##18.1 Make predictions
+predictions <- tree_fit %>% 
+  predict(review_test) %>%
+  pull(.pred)
+
+##18.2 Calculate Root MSE and R-squared
+metrics <- metric_set(rmse, rsq)
+model_performance <- review_test %>%
+  mutate(predictions=predictions) %>%
+  metrics(truth=medv, estimate=predictions)
+#this is not working
+
+
+
+
+
+#19.0 Repeat MODELLING 4: [TRAINING DATA] Regression Decision Tree
+
+##19.1 Install required packages
+install.packages("tree")
+library(tree)
+install.packages("rpart")
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+
+
+##19.2 Construct tree using rpart package
+rpart_tree <- rpart(stars ~ ., data=review_train)
+
+##19.3 Construct graph
+rpart.plot(rpart_tree)
+
+
+#20.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
+
+##20.1 Make predictions and add to the test data
+regression_tree_prediction <- predict(rpart_tree,new_data=review_test) %>% 
+  cbind(review_test)
+View(regression_tree_prediction)
+
+##20.2 Evaluating Performance
+
+###20.2.1 Evaluating using mae (Mean Absolute Error)
+regression_tree_performance_mae <- mae(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_mae)
+#Finding: estimate = 1.355557
+
+###20.2.2 Evaluating using rmse (Root Mean Squared Error)
+regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_rmse)
+#Finding: estimate = 1.633423
+
+
+
 
 
 
@@ -421,7 +544,7 @@ merged_tibble_train <- mutate(tidy_review_train, stars = review_y_train)
 
 
 matrix_review_train <- as.matrix(DTM_review_train)
-  
+
 
 
 tibble_review_train <- cbind(DTM_review_train, review_y_train) #merge stars with predictor
@@ -673,4 +796,3 @@ General1star <- subset(review_data_small2, stars == 1)
 General1star_text <- paste(General1star$text, collapse = " ")
 Worldcloud_1star <- wordcloud(words = strsplit(General1star_text, " ")[[1]], freq = rep(1, length(strsplit(General1star_text, " ")[[1]])),colors=c("chartreuse", "cornflowerblue", "darkorange"),max.words=100)
 wordcloud2(Wordcloud_1star) # Display the word cloud 
-
