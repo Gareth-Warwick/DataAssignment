@@ -267,7 +267,7 @@ DTM_review_test <- dfm(token_review_test) %>%
 Clean_DTM_review_test <- dfm_remove(DTM_review_test)
 
 
-##12.5 Trim DFM such that it has the same features as training DFM
+##12.5 Trim DFM such that it has the same features as training DFM (ref step 9.6)
 Trim_DTM_review_test <- dfm_match(Clean_DTM_review_test, featnames(Trim_DTM_review_train))
 
 
