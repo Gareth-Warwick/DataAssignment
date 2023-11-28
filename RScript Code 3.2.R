@@ -28,6 +28,7 @@ load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignm
 
 ##2.3 View all the data (note the capital letter for "View" command)
 View(review_data_small)
+summary(review_data_small)
 
 
 ##2.4 Remove duplicates
