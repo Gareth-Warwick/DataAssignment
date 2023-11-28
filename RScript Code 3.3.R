@@ -200,16 +200,16 @@ stars_review <- subset(review_data_small4, select = c(2))
 ##9.3 Join output with predictors
 Matrix_review <- cbind(stars_review,Matrix_DFM_review)
 View(Matrix_review)
-#Output: A 698664 x 59 matrix
+#Output: A 698664 x 14 matrix
 
-##9.4 Inspect matrix and clean accordingly
+## SCRAPPED -- 9.4 Inspect matrix and clean accordingly
 
-###9.4.1 Clean matrix by deleting 2nd column which contained the predictor variable "stars" as this is unlikely to give significant information, and instead complicates things due to it bearing the same name as output variable
+### SCRAPPED - 9.4.1 Clean matrix by deleting 2nd column which contained the predictor variable "stars" as this is unlikely to give significant information, and instead complicates things due to it bearing the same name as output variable
 Matrix_review2 <- subset(Matrix_review, select = c(-2))
 View(Matrix_review2)
 #Output: A 698664 x 58 matrix
 
-###9.4.2 Clean matrix by deleting 54th column which contained the predictor variable "stars.1" as this yields no significant information
+### SCRAPPED -- 9.4.2 Clean matrix by deleting 54th column which contained the predictor variable "stars.1" as this yields no significant information
 Matrix_review3 <- subset(Matrix_review2, select = c(-54))
 View(Matrix_review3)
 #Output: A 698664 x 57 matrix
@@ -219,8 +219,7 @@ View(Matrix_review3)
 rm(Matrix_DFM_review)
 rm(stars_review)
 rm(Trim_DFM_review)
-rm(Matrix_review)
-rm(Matrix_review2)
+
 
 
 
@@ -229,14 +228,13 @@ rm(Matrix_review2)
 
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
-train <- sample(1:nrow(Matrix_review3), 3*nrow(Matrix_review3)/4) #split 3/4 and 1/4
-review_train <- Matrix_review3[train,] #Training Data
-review_test<- Matrix_review3[-train,] #Test Data
+train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
+review_train <- Matrix_review[train,] #Training Data
+review_test<- Matrix_review[-train,] #Test Data
 
 ##10.1 Clear Memory
 rm(train)
 rm(review_data_small4)
-rm(Matrix_review3)
 
 ##10.2 Within TRAINING data, split into predictors and output (stars)
 review_train_predictors <- review_train[,-1]
@@ -267,7 +265,7 @@ linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1])
 
 ##12.2 Calculate empirical Mean Squared Error in the TEST data
 linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
-#Finding: Mean Squared Error = 1.60279657547768 --> greater than 1 --> too large --> there is a problem with this model --> proceed to new model
+#Finding: Mean Squared Error = 1.88859240561294 --> greater than 1 --> too large --> there is a problem with this model --> proceed to new model
 
 
 
@@ -304,7 +302,7 @@ ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
 
 
 
-#15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
+#15.0 MODELLING 3: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
 
 #15.1 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
 cv.out.LASSO <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=1, nfolds=10)
