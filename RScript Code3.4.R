@@ -7,12 +7,13 @@ setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assig
 install.packages("tidyverse") 
 library(tidyverse)
 
-##1.3 Set seed to control randomisation
-set.seed(1)
-
-#1.4 Clear
+#1.3 Clear
 cat("\014")  
 rm(list=ls())
+
+
+##1.4 Set seed to control randomisation
+set.seed(1)
 
 
 
@@ -25,16 +26,14 @@ rm(list=ls())
 ###2.1.1 Load the dataset "review_data_small"
 load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
 
-
-##2.3 View all the data (note the capital letter for "View" command)
+##2.2 View all the data (note the capital letter for "View" command)
 View(review_data_small)
 
-
-##2.4 Remove duplicates
+##2.3 Remove duplicates and empty text
 review_data_clean <- review_data_small %>%
   filter(!duplicated(text) & text != "")
 
-##2.5 Clear Memory
+##2.4 Clear Memory
 rm(review_data_small)
 
 
@@ -172,7 +171,7 @@ DFM_review <- dfm(token_review) %>%
 Clean_DFM_review <- dfm_remove(DFM_review)
 
 ##8.6 Trim DFM
-Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.1, docfreq_type = "prop") #remove features that appear in less than 10% of the reviews
+Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.03, docfreq_type = "prop") #remove features that appear in less than 3% of the reviews
 
 View(Trim_DFM_review) #View entire DFM
 Trim_DFM_review #view some features
@@ -192,35 +191,25 @@ rm(Clean_DFM_review)
 ##9.1 Convert DFM into a matrix containing only predictors (ie features and words)
 Matrix_DFM_review <- as.matrix(Trim_DFM_review) #IT WORKSSSSSSSSS
 
+###9.1.1 Clean Matrix by deleting the column containing the predictor variables "stars" and "star" as these are unlikely to give significant information, and instead complicate things due to them bearing the same/almost similar names as output variable
+Matrix_DFM_review2 <- subset(Matrix_DFM_review, select = -c(stars,star))
+
 ##9.2 Acquire vector containing output (stars) from original training dataset "review_data_small4"
 stars_review <- subset(review_data_small4, select = c(2))
 
 
 
 ##9.3 Join output with predictors
-Matrix_review <- cbind(stars_review,Matrix_DFM_review)
+Matrix_review <- cbind(stars_review,Matrix_DFM_review2)
 View(Matrix_review)
-#Output: A 698664 x 59 matrix
-
-##9.4 Inspect matrix and clean accordingly
-
-###9.4.1 Clean matrix by deleting 2nd column which contained the predictor variable "stars" as this is unlikely to give significant information, and instead complicates things due to it bearing the same name as output variable
-Matrix_review2 <- subset(Matrix_review, select = c(-2))
-View(Matrix_review2)
-#Output: A 698664 x 58 matrix
-
-###9.4.2 Clean matrix by deleting 54th column which contained the predictor variable "stars.1" as this yields no significant information
-Matrix_review3 <- subset(Matrix_review2, select = c(-54))
-View(Matrix_review3)
-#Output: A 698664 x 57 matrix
+#Output: A 698664 x 146 matrix
 
 
-##9.5 Clear Memory
+##9.4 Clear Memory
 rm(Matrix_DFM_review)
+rm(Matrix_DFM_review2)
 rm(stars_review)
 rm(Trim_DFM_review)
-rm(Matrix_review)
-rm(Matrix_review2)
 
 
 
@@ -229,14 +218,14 @@ rm(Matrix_review2)
 
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
-train <- sample(1:nrow(Matrix_review3), 3*nrow(Matrix_review3)/4) #split 3/4 and 1/4
-review_train <- Matrix_review3[train,] #Training Data
-review_test<- Matrix_review3[-train,] #Test Data
+train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
+review_train <- Matrix_review[train,] #Training Data
+review_test<- Matrix_review[-train,] #Test Data
 
 ##10.1 Clear Memory
 rm(train)
 rm(review_data_small4)
-rm(Matrix_review3)
+rm(Matrix_review)
 
 ##10.2 Within TRAINING data, split into predictors and output (stars)
 review_train_predictors <- review_train[,-1]
@@ -267,7 +256,7 @@ linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1])
 
 ##12.2 Calculate empirical Mean Squared Error in the TEST data
 linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
-#Finding: Mean Squared Error = 1.60279657547768 --> greater than 1 --> too large --> there is a problem with this model --> proceed to new model
+#Finding: Mean Squared Error = 1.44264812413296 
 
 
 
@@ -298,7 +287,7 @@ summary(ridge.mod)
 ##14.1 Fit on test data
 ridge.pred <- predict(ridge.mod, s=lambda_ridge_cv, newx=as.matrix(review_test_predictors))
 ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
-#Finding: Mean Squared Error = 1.60262661888015 --> greater than 1 --> too large --> there is a problem with this model
+#Finding: Mean Squared Error = 1.4425061026715 
 
 
 
@@ -327,8 +316,12 @@ summary(LASSO.mod)
 ##16.1 Fit on test data
 LASSO.pred <- predict(LASSO.mod, s=lambda_LASSO_cv, newx=as.matrix(review_test_predictors))
 LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
-#Finding: Mean Squared Error = 1.60277113029859 --> greater than 1 --> too large --> there is a problem with this model
-#Nonetheless, since LASSO_MSE = 1.60277113029859 > ridge_MSE = 1.60262661888015, ridge is a better regression in this case, though both are quite bad
+#Finding: Mean Squared Error = 1.44261530919753 --> greater than 1 --> too large --> there is a problem with this model
+#Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.4425061026715, ridge is a better prediction model in this case
+
+
+
+
 
 
 
@@ -338,98 +331,44 @@ LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
 #17.0 MODELLING 4: [TRAINING DATA] Regression Decision Tree 
 
 ##17.1 Install required packages
-install.packages("tidymodels")
-library(tidymodels)
-
-##17.2 SCRAPPED - Convert output variable (stars) from numeric into a factor variable
-
-###17.2.1 SCRAPPED- Extract output (stars) from training data
-review_train_stars <- subset(review_train, select = c(1))
-review_train_predictors <- subset(review_train, select=c(-1))
-
-###17.2.2 SCRAPPED- Convert stars into factor from numeric
-review_train_stars2 <- factor(review_train_stars, levels=1:5)
-
-###17.2.3 SCRAPPED- Combine factor stars with predictors
-review_train_factor_stars <- cbind(review_train_stars2,review_train_predictors)
-View(review_train_factor_stars)
-
-
-
-
-##17.2 SCRAPPED- Convert matrix into factors
-review_train2 <- factor(review_train, levels=0:50)
-
-
-
-
-##17.2 Create a decision tree model specification
-tree_spec <- decision_tree()%>%
-  set_engine("rpart") %>%
-  set_mode("regression")
-
-##17.3 Fit model to the training data
-tree_fit <- tree_spec %>%
-  fit(stars ~ . , data=review_train)
-
-
-
-
-#18.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
-
-##18.1 Make predictions
-predictions <- tree_fit %>% 
-  predict(review_test) %>%
-  pull(.pred)
-
-##18.2 Calculate Root MSE and R-squared
-metrics <- metric_set(rmse, rsq)
-model_performance <- review_test %>%
-  mutate(predictions=predictions) %>%
-  metrics(truth=medv, estimate=predictions)
-#this is not working
-
-
-
-
-
-#19.0 Repeat MODELLING 4: [TRAINING DATA] Regression Decision Tree
-
-##19.1 Install required packages
 install.packages("tree")
 library(tree)
 install.packages("rpart")
 library(rpart)
 install.packages("rpart.plot")
 library(rpart.plot)
+install.packages("tidymodels")
+library(tidymodels)
 
 
-##19.2 Construct tree using rpart package
+##17.2 Construct tree using rpart package
 rpart_tree <- rpart(stars ~ ., data=review_train)
 
-##19.3 Construct graph
+##17.3 Construct graph
 rpart.plot(rpart_tree)
 
 
-#20.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
+#18.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
 
-##20.1 Make predictions and add to the test data
+##18.1 Make predictions and add to the test data
 regression_tree_prediction <- predict(rpart_tree,new_data=review_test) %>% 
   cbind(review_test)
 View(regression_tree_prediction)
 
-##20.2 Evaluating Performance
+##18.2 Evaluating Performance
 
-###20.2.1 Evaluating using mae (Mean Absolute Error)
+###18.2.1 Evaluating using mae (Mean Absolute Error)
 regression_tree_performance_mae <- mae(regression_tree_prediction, estimate = ".", truth=stars)
 
 View(regression_tree_performance_mae)
 #Finding: estimate = 1.355557
 
-###20.2.2 Evaluating using rmse (Root Mean Squared Error)
+###18.2.2 Evaluating using rmse (Root Mean Squared Error)
 regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = ".", truth=stars)
 
 View(regression_tree_performance_rmse)
-#Finding: estimate = 1.633423
+#Finding: estimate = 1.636508
+regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
+# Mean Squared Error (estimate) = 2.67815955669566
 
 
