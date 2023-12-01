@@ -316,7 +316,7 @@ summary(LASSO.mod)
 ##16.1 Fit on test data
 LASSO.pred <- predict(LASSO.mod, s=lambda_LASSO_cv, newx=as.matrix(review_test_predictors))
 LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
-#Finding: Mean Squared Error = 1.44261530919753 --> greater than 1 --> too large --> there is a problem with this model
+#Finding: Mean Squared Error = 1.44261530919753 
 #Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.4425061026715, ridge is a better prediction model in this case
 
 
