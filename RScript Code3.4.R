@@ -249,8 +249,6 @@ linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regress
 summary(linreg_unreg_train)
 
 
-
-
 #12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
 
 ##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
@@ -258,6 +256,8 @@ linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1])
 
 ##12.2 Calculate empirical Mean Squared Error in the TEST data
 linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
+
+sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44264812413296 
 
 
@@ -272,9 +272,18 @@ install.packages("glmnet")
 library(glmnet)
 
 ##13.2 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+
+###13.2.1
 cv.out.ridge <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=0, nfolds=10)
+
+###13.2.2 Plot lambda against MSE
 plot(cv.out.ridge)
-lambda_ridge_cv <- cv.out.ridge$lambda.min #choose lambda that minimises empirial MSE in training data set
+
+###13.2.3 Find lambda that minimises empirial MSE in training data set
+lambda_ridge_cv <- cv.out.ridge$lambda.min 
+
+sprintf((lambda_ridge_cv), fmt = '%#.14f')
+#Estimate = 0.03663183779814
 
 ##13.3 Estimate Ridge with lambda chosen by Cross Validation
 ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda=lambda_ridge_cv, thresh=1e-12)
@@ -289,7 +298,9 @@ summary(ridge.mod)
 ##14.1 Fit on test data
 ridge.pred <- predict(ridge.mod, s=lambda_ridge_cv, newx=as.matrix(review_test_predictors))
 ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
-#Finding: Mean Squared Error = 1.4425061026715 
+
+sprintf((ridge_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44250610267150 
 
 
 
@@ -318,6 +329,8 @@ summary(LASSO.mod)
 ##16.1 Fit on test data
 LASSO.pred <- predict(LASSO.mod, s=lambda_LASSO_cv, newx=as.matrix(review_test_predictors))
 LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
+
+sprintf((LASSO_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44261530919753 
 #Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.4425061026715, ridge is a better prediction model in this case
 
