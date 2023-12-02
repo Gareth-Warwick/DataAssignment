@@ -211,6 +211,8 @@ rm(Matrix_DFM_review2)
 rm(stars_review)
 rm(Trim_DFM_review)
 
+#9.5 Display top 10 rows
+head(Matrix_review, 10)
 
 
 
