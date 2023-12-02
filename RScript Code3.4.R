@@ -372,3 +372,26 @@ regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
 # Mean Squared Error (estimate) = 2.67815955669566
 
 
+
+
+#19.0 Obtain coefficients of Ridge
+
+##19.1 Extract coefficients from Ridge model (exclude intercept which is in column 1)
+Ridge_coefficients <- coef(ridge.mod)[-1]
+
+##19.2 Extract feature names from Ridge model (obtained from review_train_predictors)
+Ridge_features <- colnames(as.matrix(review_train_predictors))
+
+##19.3 Combine coefficients and feature names
+Ridge_overview <- data.frame(Coefficient = as.matrix(Ridge_coefficients), Feature_Name = Ridge_features)
+
+##19.4 Add a column for absolute coefficient magnitude
+Ridge_overview <- Ridge_overview %>%
+  mutate(Coefficient_Magnitude = abs(Coefficient))
+
+##19.5 Sort the data frame by coefficient magnitude in descending order
+Ridge_overview <- Ridge_overview %>%
+  arrange(desc(Coefficient_Magnitude))
+
+##19.6 Display top 30 rows
+head(Ridge_overview, 30)
