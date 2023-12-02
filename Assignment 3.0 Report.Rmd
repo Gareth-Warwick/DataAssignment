@@ -38,4 +38,369 @@ Therefore, this research seeks to conduct a textual analysis of consumers’ rev
 This report comprises 5 sections: Section 2 explains the Data Science Methodology, Section 3 prepares the data, and Section 4 constructs and evaluates 4 prediction models. Section 5 assesses the chosen model’s deployment, while Section 6 addresses difficulties encountered.
 
 # 2) METHODOLOGY
+This research uses John Rollins’ Data Science Methodology (Figure 1) due to it being better able — compared to other methodologies — to incorporate new practices in data science such as the usage of big data and the conducting of textual analysis (Rollins, 2015, p. 2). Additionally, the methodology’s iterative feature allows for constant re-collection and re-processing of data (Rollins, 2015, p. 5), enabling the tuning of models to be more accurate in prediction. Hence, this project will be structured according to the methodology.
+
+![_Figure 1: Foundational Methodology for Data Science (Rollins, 2015, p. 3)_](https://miro.medium.com/v2/resize:fit:623/1*nlMfVD6k_s9xWN0QACLUPQ.png)
+
+# 3) DATA 
+
+## 3.1) REQUIREMENTS AND COLLECTION
+
+This research used the _User Review_ dataset provided by Yelp (Yelp, 2023):
+
+```{r include=FALSE}
+#1.0 Setting up
+
+##1.1 Setting Working Directory
+setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0")
+
+##1.2 Download and Load Tidyverse Package
+install.packages("tidyverse") 
+library(tidyverse)
+
+#1.3 Clear
+cat("\014")  
+rm(list=ls())
+
+##1.4 Set seed to control randomisation
+set.seed(1)
+
+
+#2.0 DATA COLLECTION: Loading the data into computer
+
+##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
+
+###2.1.1 Load the dataset "review_data_small"
+load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
+
+##2.2 View all the data (note the capital letter for "View" command)
+View(review_data_small)
+```
+
+
+| Variable Name | Data Type | Description |
+|:-----:|:-----:|:-----:|
+|review_id| String| 22 character unique review id|
+|user_id| String| 22 character unique user id|
+|business_id| String| 22 character unique business id|
+|stars|Integer|Star rating|
+|date| String| Date formatted YYYY-MM-DD|
+|text| String| The review itself|
+|useful| Integer| Number of useful votes received|
+|funny| Integer| Number of funny votes received|
+|cool| Integer| Number of cool votes received|
+
+
+As our machine was unable to process the original large dataset, we imported a pre-made smaller dataset _“review_data_small”_ and took a random sample which served as an unbiased representation of the population. We acknowledge that precision may be lost due to fewer observations being captured, but the expensive solution of increasing the machine’s Random-Access Memory was unfeasible given our resource constraints. 
+
+We removed all reviews which contained no text as they served no informative function. Furthermore, we removed all observations containing duplicated reviews, preserving only 1 review to avoid contradictions where the same input generates different output. 
+
+
+```{r include=FALSE}
+##2.3 Remove duplicates and empty text
+review_data_clean <- review_data_small %>%
+  filter(!duplicated(text) & text != "")
+
+##2.4 Clear Memory
+rm(review_data_small)
+
+
+#3.0 DATA UNDERSTANDING: View summary of star ratings 
+install.packages("janitor")
+library(janitor)
+tabyl(review_data_clean$stars, sort=TRUE)
+#Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.28% | 2star: 7.82% | 3star: 9.92% | 4 star: 20.78% | 5star: 46.21%)
+
+summary(review_data_clean)
+
+
+#4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
+randomsample <- sample(1:nrow(review_data_clean), 1*nrow(review_data_clean)/2)
+review_data_small2 <- review_data_clean[randomsample,]
+
+#4.1 Clear Memory
+rm(randomsample)
+rm(review_data_clean)
+
+```
+
+
+## 3.2) UNDERSTANDING
+
+We treat star-ratings as a continuous variable to account for variance that is lost when treating star-ratings as a categorical variable (Al-Natour and Turetken, 2020, p. 2), thereby enhancing the models’ performances. Additionally, treating star-ratings as continuous enables businesses to better visualise how specific words used in reviews affect predicted star-ratings. 
+
+We clean the text by converting it into lowercase text without any digits and punctuation, before tokenising the text and removing stopwords — which are words that provide little information — using the pre-made stopword list _“stopwords-iso”_ due to it being the most comprehensive.
+
+```{r include=FALSE}
+#5.0 DATA PREPARATION: Filter the data
+
+##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
+review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
+View(review_data_small3)
+
+##5.2 Clearing Memory
+rm(review_data_small2)
+
+
+#6.0 DATA PREPARATION: clean the text
+review_data_small3 <- review_data_small3 |>
+  dplyr::mutate(
+    clean_text = tolower(text), #converts all text in the 'text' column to lowercase --> eliminate case sensitivity and ensure consistent representation of words
+    clean_text = gsub("[']", "", clean_text), #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
+    clean_text = gsub("[[:punct:]]", " ", clean_text), #eliminate all punctuation marks, such as commas, periods, question marks etc, leaving only whitespace-separated words
+    clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
+    clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
+    clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
+
+##6.1 Remove duplicate rows with duplicates in clean_text (again)
+review_data_small3clean <- review_data_small3 %>%
+  filter(!duplicated(clean_text) & clean_text != "")
+
+##6.2 Clear memory
+rm(review_data_small3)
+
+##6.3 Extract the relevant columns
+review_data_small4 <- subset(review_data_small3clean, select = c(1,2,4) ) #extract out column 1 (review_id), column 2 (stars) and column 4 (clean_text)
+View(review_data_small4)
+
+##6.4 Clear memory
+rm(review_data_small3clean)
+
+
+#7.0 DATA UNDERSTANDING
+
+##7.1 Install required packages
+install.packages("tm")
+library(tm)
+install.packages("tidytext")
+library(tidytext)
+
+##7.2 TOKENIZE THE TEXT
+#Consider filtering out redundant words
+tokenized_review <- review_data_small4 %>%
+  unnest_tokens(input = clean_text, output = word)
+
+View(tokenized_review) #View the tokens
+
+##7.3 Remove stopwords
+install.packages("stopwords")
+library(stopwords)
+cleaned_tokenized_review <- tokenized_review %>%
+  anti_join(get_stopwords()) %>%
+  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made lexicon called "stopwords-iso" 
+
+##7.4 Clear memory
+rm(tokenized_review)
+```
+
+From the data, we observe that individual words are often associated with multiple star-ratings. Hence, our model will predict star-ratings based on the combined effect of multiple words within a singular review.
+
+```{r echo=FALSE}
+##7.5 Count and sort most common words
+cleaned_tokenized_review %>%
+  count(word, sort = TRUE) 
+
+##7.6 Count the occurrences of words with specific stars, sort based on frequency
+overall_stars_text_count <- cleaned_tokenized_review %>%
+  count(word, stars, sort = TRUE)
+
+View(overall_stars_text_count)
+
+##7.7 Visualise
+overall_stars_text_count %>%
+  filter(n > 0.5*length(cleaned_tokenized_review)) %>%
+  mutate(word = reorder(word, n)) %>%
+  slice_max(order_by=n,n=100) %>% #Select the top 100 words 
+  ggplot(aes(word, 0.5*length(cleaned_tokenized_review), fill = stars)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Contribution to stars rating")
+#Finding: Based on the top 100 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
+#--> In terms of tangible business attributes, "food", "service", "staff", friendly", "delicious", "restaurant", "experience" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
+```
+
+## 3.3) PREPARATION
+We convert the text into a document feature matrix (DFM) and filter out words that appear in less than 3% of the observations to remove explanatory variables with little data. This DFM is converted into a data frame featuring star-ratings (output) and the frequency of usage for each word (predictors) for a given review. 
+
+
+```{r echo=FALSE}
+#8.0 DATA PREPARATION -- Create a Document Feature Matrix (go back to "review_train_small4", but remember to remove stop words here)
+
+##8.1 Install required packages
+install.packages("quanteda")
+library(quanteda)
+
+##8.2 Create a corpus
+corpus_review <- corpus(review_data_small4$clean_text, docnames = review_data_small4$review_id)
+summary(corpus_review)
+
+##8.3 Tokenise the text
+token_review <- tokens(corpus_review)
+
+##8.4 Create a Document Feature Matrix (this will take a pretty long time)
+DFM_review <- dfm(token_review) %>%
+  dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the premade stopword list "stopwords-iso" 
+
+##8.5 Remove stopwords
+Clean_DFM_review <- dfm_remove(DFM_review)
+
+##8.6 Trim DFM
+Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.03, docfreq_type = "prop") #remove features that appear in less than 3% of the reviews
+
+View(Trim_DFM_review) #View entire DFM
+Trim_DFM_review #view some features
+
+##8.7 Clear Memory
+rm(corpus_review)
+rm(token_review)
+rm(DFM_review)
+rm(Clean_DFM_review)
+#Keep Trim_DFM_review for now
+
+#9.0 DATA PREPARATION -- Create Matrix 
+
+##9.1 Convert DFM into a matrix containing only predictors (ie features and words)
+Matrix_DFM_review <- as.matrix(Trim_DFM_review) #IT WORKSSSSSSSSS
+
+###9.1.1 Clean Matrix by deleting the column containing the predictor variables "stars" and "star" as these are unlikely to give significant information, and instead complicate things due to them bearing the same/almost similar names as output variable
+Matrix_DFM_review2 <- subset(Matrix_DFM_review, select = -c(stars,star))
+
+##9.2 Acquire vector containing output (stars) from original training dataset "review_data_small4"
+stars_review <- subset(review_data_small4, select = c(2))
+
+##9.3 Join output with predictors
+Matrix_review <- cbind(stars_review,Matrix_DFM_review2)
+View(Matrix_review)
+#Output: A 698664 x 146 matrix
+
+##9.4 Clear Memory
+rm(Matrix_DFM_review)
+rm(Matrix_DFM_review2)
+rm(stars_review)
+rm(Trim_DFM_review)
+
+#9.5 Display top 10 rows
+head(Matrix_review, 10)
+```
+
+We split the data into a training dataset and a test dataset in a ratio of 3:1, ensuring that there are at least 10,000 observations in the test dataset to attain more accurate estimates of out-of-sample performance for evaluation. To ensure that models thoroughly learn meaningful patterns, we set the training dataset to be larger than the test dataset. 
+
+```{r include=FALSE} 
+#10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
+train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
+review_train <- Matrix_review[train,] #Training Data
+review_test<- Matrix_review[-train,] #Test Data
+
+##10.1 Clear Memory
+rm(train)
+rm(review_data_small4)
+rm(Matrix_review)
+
+##10.2 Within TRAINING data, split into predictors and output (stars)
+review_train_predictors <- review_train[,-1]
+review_train_stars <- review_train[,1]
+
+##10.3 Within TEST data, split into predictors and output (stars)
+review_test_predictors <- review_test[,-1]
+review_test_stars <- review_test[,1]
+```
+
+# 4) MODELLING AND EVALUATION
+## 4.1) ORDINARY LEAST-SQUARES (OLS) REGRESSION 
+Assuming a linear relationship between the frequency of usage for each word and the star-rating, we seek to minimise the difference between our predicted value and our actual value. Therefore, using the training data, we construct an OLS regression where the predicted star-rating for consumer i is: 
+
+$\hat{star}_{i}=\sum_{W = 1}^{p}\hat{\beta_{W}} X_{i,W}$, where $X_{i,W}$  is the number of times that word W was used by consumer i
+
+Where the OLS estimator $\hat{\beta_{W}^{OLS}}$ solves: 
+
+$argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2)$
+
+```{r echo=FALSE}
+#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+
+##11.1 Construct linear regression of "stars" against "features"
+linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
+
+##11.2 Review results and coefficients
+summary(linreg_unreg_train)
+
+```
+
+Calculating the mean squared error (MSE), we get $MSE_{OLS}= 1.44264812413296$.
+
+```{r echo=FALSE}
+#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+
+##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
+linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
+
+##12.2 Calculate empirical Mean Squared Error in the TEST data
+linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
+
+sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44264812413296 
+```
+
+However, cognizant that OLS estimators are unbiased while incurring high variance, we are willing to use Shrinkage methods to incur bias and reduce variance to achieve greater prediction accuracy, so long as the reduction in variance is greater than the increase in bias. 
+
+
+## 4.2) RIDGE REGRESSION 
+Preserving the assumption of linearity, we conduct a Ridge regression by imposing a penalisation term on the estimator term, such that $\hat{\beta_{W}^{Ridge}}$ now solves:
+
+$argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2 + \lambda\sum_{W=1}^{p}\beta_{W}^2)$
+
+By penalising excessively large predictors, we reduce the model’s variance by shrinking the estimator coefficients, while retaining the same number of predictors as the OLS.
+
+Using cross-validation, we choose the $\lambda$ that minimises the MSE based on the training dataset, where $\lambda_{Ridge}= 0.0366318377981449$. 
+
+```{r include=FALSE}
+#13.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##13.1 Install required packages
+install.packages("glmnet")
+library(glmnet)
+
+##13.2 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+
+###13.2.1
+cv.out.ridge <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=0, nfolds=10)
+```
+
+```{r echo=FALSE}
+###13.2.2 Plot lambda against MSE
+plot(cv.out.ridge)
+```
+
+```{r echo=FALSE}
+###13.2.3 Find lambda that minimises empirial MSE in training data set
+lambda_ridge_cv <- cv.out.ridge$lambda.min 
+
+sprintf((lambda_ridge_cv), fmt = '%#.14f')
+#Estimate = 0.03663183779814
+```
+
+
+Calculating the MSE, we get $MSE_{Ridge}=1.4425061026715$.
+
+```{r}
+##13.3 Estimate Ridge with lambda chosen by Cross Validation
+ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda=lambda_ridge_cv, thresh=1e-12)
+
+summary(ridge.mod)
+
+
+#14.0 MODEL EVALUATION 2: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##14.1 Fit on test data
+ridge.pred <- predict(ridge.mod, s=lambda_ridge_cv, newx=as.matrix(review_test_predictors))
+ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
+
+sprintf((ridge_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44250610267150 
+
+```
+
+
+
+
 
