@@ -30,7 +30,12 @@ Proofreading Policy
 Education Policy and Quality Team
 Academic Integrity (warwick.ac.uk)
 
-# Introduction
+# 1) INTRODUCTION
+With online platforms facilitating costless comparison of businesses for consumers (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising businesses as they influence customers’ trust in businesses (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
 
+Therefore, this research seeks to conduct a textual analysis of consumers’ reviews to predict businesses’ star-ratings. This research is relevant for businesses seeking to identify and improve key attributes that are prioritised by customers in their reviews, thus boosting their star-ratings and attracting customers to maximise profits.
 
+This report comprises 5 sections: Section 2 explains the Data Science Methodology, Section 3 prepares the data, and Section 4 constructs and evaluates 4 prediction models. Section 5 assesses the chosen model’s deployment, while Section 6 addresses difficulties encountered.
+
+# 2) METHODOLOGY
 
