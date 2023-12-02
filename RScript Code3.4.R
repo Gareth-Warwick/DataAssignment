@@ -304,22 +304,27 @@ sprintf((ridge_MSE), fmt = '%#.14f')
 
 
 
-
-
 #15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
 
-#15.1 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+##15.1 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+
+###15.1.1 
 cv.out.LASSO <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=1, nfolds=10)
+
+###15.1.2 Plot lambda against MSE
 plot(cv.out.LASSO)
-lambda_LASSO_cv <- cv.out.LASSO$lambda.min #choose lambda that minimises empirial MSE in training data set
+
+###15.1.3 Find lambda that minimises empirial MSE in training data set
+lambda_LASSO_cv <- cv.out.LASSO$lambda.min 
+
+sprintf((lambda_LASSO_cv), fmt = '%#.14f')
+#Estimate = 0.00054397116518
+
 
 ##15.2 Estimate LASSO with lambda chosen by Cross Validation
 LASSO.mod <- glmnet(review_train_predictors, review_train_stars, alpha=1, lambda=lambda_LASSO_cv, thresh=1e-12)
 
 summary(LASSO.mod)
-
-
-
 
 
 
@@ -384,7 +389,9 @@ regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = 
 View(regression_tree_performance_rmse)
 #Finding: estimate = 1.636508
 regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
-# Mean Squared Error (estimate) = 2.67815955669566
+
+sprintf((regressiontree_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error (estimate) = 2.67815955669566 
 
 
 
