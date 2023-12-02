@@ -1,0 +1,546 @@
+---
+title: "Predicting User Star-Ratings on Businesses using Text Analysis — Empirical
+  Evidence from Yelp"
+author: "Gareth Pang (u2100906)"
+date: "2023-12-02"
+output:
+  html_document: default
+  pdf_document: default
+subtitle: "GitHub Link: https://github.com/Gareth-Warwick/DataAssignment"
+---
+
+# Tabula Statement
+
+We're part of an academic community at Warwick.
+Whether studying, teaching, or researching, we’re all taking part in an expert conversation which must meet standards of academic integrity. When we all meet these standards, we can take pride in our own academic achievements, as individuals and as an academic community.
+Academic integrity means committing to honesty in academic work, giving credit where we've used others' ideas and being proud of our own achievements.
+In submitting my work I confirm that:
+
+1. I have read the guidance on academic integrity provided in the Student Handbook and understand the University regulations in relation to Academic Integrity. I am aware of the potential consequences of Academic Misconduct.
+2. I declare that the work is all my own, except where I have stated otherwise.
+3. No substantial part(s) of the work submitted here has also been submitted by me in other credit bearing assessments courses of study (other than in certain cases of a resubmission of a piece of work), and I acknowledge that if this has been done this may lead to an appropriate sanction.
+4. Where a generative Artificial Intelligence such as ChatGPT has been used I confirm I have abided by both the University guidance and specific requirements as set out in the Student Handbook and the Assessment brief. I have clearly acknowledged the use of any generative Artificial Intelligence in my submission, my reasoning for using it and which generative AI (or AIs) I have used. Except where indicated the work is otherwise entirely my own.
+5. I understand that should this piece of work raise concerns requiring investigation in relation to any of points above, it is possible that other work I have submitted for assessment will be checked, even if marks (provisional or confirmed) have been published.
+6. Where a proof-reader, paid or unpaid was used, I confirm that the proofreader was made aware of and has complied with the University’s proofreading policy.
+7. I consent that my work may be submitted to Turnitin or other analytical technology. I understand the use of this service (or similar), along with other methods of maintaining the integrity of the academic process, will help the University uphold academic standards and assessment fairness.
+
+# Privacy statement
+The data on this form relates to your submission of coursework. The date and time of your submission, your identity, and the work you have submitted will be stored. We will only use this data to administer and record your coursework submission.
+
+Related articles
+1. [Reg. 11 Academic Integrity (from 4 Oct 2021)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Fgov%2Fcalendar%2Fsection2%2Fregulations%2Facademic_integrity%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290873980%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=sWd0P%2BD8DesgsbpH2q3NZLjtzmsCsSBfJT4sAnud3cM%3D&reserved=0)
+2. [Guidance on Regulation 11](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290882201%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=BHquE0ZFLXykoH5jpZFBtbsDh0DLAUpAISE8Ekl0cr0%3D&reserved=0)
+3. [Proofreading Policy](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Fcategories%2Fexaminations%2Fpolicies%2Fv_proofreading%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290888239%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=RXdvlCKAHDR0bb3nSZrUXR%2BkII2tGklRDWL62G8zf4E%3D&reserved=0)  
+4. [Education Policy and Quality Team](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290893237%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Ixpo1EBxPOhE8geWyKXz6MnYx9lvJ%2Bxtm4avSgxd4VU%3D&reserved=0)
+5. [Academic Integrity (warwick.ac.uk)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fstudents%2Flearning-experience%2Facademic_integrity&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290898198%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IFBZVPUF0whAbjAp7EgL%2BOmm3LQ7O26SmZQqjQrZ50E%3D&reserved=0)
+
+# 1) INTRODUCTION
+With online platforms facilitating costless comparison of businesses for consumers (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising businesses as they influence customers’ trust in businesses (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
+
+Therefore, this research seeks to conduct a textual analysis of consumers’ reviews to predict businesses’ star-ratings. This research is relevant for businesses seeking to identify and improve key attributes that are prioritised by customers in their reviews, thus boosting their star-ratings and attracting customers to maximise profits.
+
+This report comprises 5 sections: Section 2 explains the Data Science Methodology, Section 3 prepares the data, and Section 4 constructs and evaluates 4 prediction models. Section 5 assesses the chosen model’s deployment, while Section 6 addresses difficulties encountered.
+
+# 2) METHODOLOGY
+This research uses John Rollins’ Data Science Methodology (Figure 1) due to it being better able — compared to other methodologies — to incorporate new practices in data science such as the usage of big data and the conducting of textual analysis (Rollins, 2015, p. 2). Additionally, the methodology’s iterative feature allows for constant re-collection and re-processing of data (Rollins, 2015, p. 5), enabling the tuning of models to be more accurate in prediction. Hence, this project will be structured according to the methodology.
+
+![_Figure 1: Foundational Methodology for Data Science (Rollins, 2015, p. 3)_](https://miro.medium.com/v2/resize:fit:623/1*nlMfVD6k_s9xWN0QACLUPQ.png)
+
+# 3) DATA 
+
+## 3.1) REQUIREMENTS AND COLLECTION
+
+This research used the _User Review_ dataset provided by Yelp (Yelp, 2023):
+
+```{r include=FALSE}
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
+#1.0 Setting up
+
+##1.1 Setting Working Directory
+setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0")
+
+##1.2 Download and Load Tidyverse Package
+install.packages("tidyverse") 
+library(tidyverse)
+
+#1.3 Clear
+cat("\014")  
+rm(list=ls())
+
+##1.4 Set seed to control randomisation
+set.seed(1)
+
+
+#2.0 DATA COLLECTION: Loading the data into computer
+
+##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
+
+###2.1.1 Load the dataset "review_data_small"
+load(file="/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/Assignment/Small Datasets/yelp_review_small.Rda")
+
+##2.2 View all the data (note the capital letter for "View" command)
+View(review_data_small)
+```
+
+
+| Variable Name | Data Type | Description |
+|:-----:|:-----:|:-----:|
+|review_id| String| 22 character unique review id|
+|user_id| String| 22 character unique user id|
+|business_id| String| 22 character unique business id|
+|stars|Integer|Star rating|
+|date| String| Date formatted YYYY-MM-DD|
+|text| String| The review itself|
+|useful| Integer| Number of useful votes received|
+|funny| Integer| Number of funny votes received|
+|cool| Integer| Number of cool votes received|
+
+
+As our machine was unable to process the original large dataset, we imported a pre-made smaller dataset _“review_data_small”_ and took a random sample which served as an unbiased representation of the population. We acknowledge that precision may be lost due to fewer observations being captured, but the expensive solution of increasing the machine’s Random-Access Memory was unfeasible given our resource constraints. 
+
+We removed all reviews which contained no text as they served no informative function. Furthermore, we removed all observations containing duplicated reviews, preserving only 1 review to avoid contradictions where the same input generates different output. 
+
+
+```{r include=FALSE}
+##2.3 Remove duplicates and empty text
+review_data_clean <- review_data_small %>%
+  filter(!duplicated(text) & text != "")
+
+##2.4 Clear Memory
+rm(review_data_small)
+
+
+#3.0 DATA UNDERSTANDING: View summary of star ratings 
+install.packages("janitor")
+library(janitor)
+tabyl(review_data_clean$stars, sort=TRUE)
+#Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.28% | 2star: 7.82% | 3star: 9.92% | 4 star: 20.78% | 5star: 46.21%)
+
+summary(review_data_clean)
+
+
+#4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
+randomsample <- sample(1:nrow(review_data_clean), 1*nrow(review_data_clean)/2)
+review_data_small2 <- review_data_clean[randomsample,]
+
+#4.1 Clear Memory
+rm(randomsample)
+rm(review_data_clean)
+
+```
+
+
+## 3.2) UNDERSTANDING
+
+We treat star-ratings as a continuous variable to account for variance that is lost when treating star-ratings as a categorical variable (Al-Natour and Turetken, 2020, p. 2), thereby enhancing the models’ performances. Additionally, treating star-ratings as continuous enables businesses to better visualise how specific words used in reviews affect predicted star-ratings. 
+
+We clean the text by converting it into lowercase text without any digits and punctuation, before tokenising the text and removing stopwords — which are words that provide little information — using the pre-made stopword list _“stopwords-iso”_ due to it being the most comprehensive.
+
+```{r include=FALSE}
+#5.0 DATA PREPARATION: Filter the data
+
+##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
+review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
+View(review_data_small3)
+
+##5.2 Clearing Memory
+rm(review_data_small2)
+
+
+#6.0 DATA PREPARATION: clean the text
+review_data_small3 <- review_data_small3 |>
+  dplyr::mutate(
+    clean_text = tolower(text), #converts all text in the 'text' column to lowercase --> eliminate case sensitivity and ensure consistent representation of words
+    clean_text = gsub("[']", "", clean_text), #remove all single quote characters (') from the text, ensuring that they don't interfere with subsequent processing
+    clean_text = gsub("[[:punct:]]", " ", clean_text), #eliminate all punctuation marks, such as commas, periods, question marks etc, leaving only whitespace-separated words
+    clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
+    clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
+    clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
+
+##6.1 Remove duplicate rows with duplicates in clean_text (again)
+review_data_small3clean <- review_data_small3 %>%
+  filter(!duplicated(clean_text) & clean_text != "")
+
+##6.2 Clear memory
+rm(review_data_small3)
+
+##6.3 Extract the relevant columns
+review_data_small4 <- subset(review_data_small3clean, select = c(1,2,4) ) #extract out column 1 (review_id), column 2 (stars) and column 4 (clean_text)
+View(review_data_small4)
+
+##6.4 Clear memory
+rm(review_data_small3clean)
+
+
+#7.0 DATA UNDERSTANDING
+
+##7.1 Install required packages
+install.packages("tm")
+library(tm)
+install.packages("tidytext")
+library(tidytext)
+
+##7.2 TOKENIZE THE TEXT
+#Consider filtering out redundant words
+tokenized_review <- review_data_small4 %>%
+  unnest_tokens(input = clean_text, output = word)
+
+View(tokenized_review) #View the tokens
+
+##7.3 Remove stopwords
+install.packages("stopwords")
+library(stopwords)
+cleaned_tokenized_review <- tokenized_review %>%
+  anti_join(get_stopwords()) %>%
+  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made lexicon called "stopwords-iso" 
+
+##7.4 Clear memory
+rm(tokenized_review)
+```
+
+From the data, we observe that individual words are often associated with multiple star-ratings. Hence, our model will predict star-ratings based on the combined effect of multiple words within a singular review.
+
+```{r echo=FALSE}
+##7.5 Count and sort most common words
+cleaned_tokenized_review %>%
+  count(word, sort = TRUE) 
+
+##7.6 Count the occurrences of words with specific stars, sort based on frequency
+overall_stars_text_count <- cleaned_tokenized_review %>%
+  count(word, stars, sort = TRUE)
+
+View(overall_stars_text_count)
+
+##7.7 Visualise
+overall_stars_text_count %>%
+  filter(n > 0.5*length(cleaned_tokenized_review)) %>%
+  mutate(word = reorder(word, n)) %>%
+  slice_max(order_by=n,n=50) %>% #Select the top 100 words 
+  ggplot(aes(word, 0.5*length(cleaned_tokenized_review), fill = stars)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Contribution to stars rating")
+#Finding: Based on the top 50 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
+#--> In terms of tangible business attributes, "food", "service", "staff", friendly", "delicious", "restaurant", "experience" are within the top 50 words that have the largest contribution to star rating (due to their highest usage)
+```
+
+## 3.3) PREPARATION
+We convert the text into a document feature matrix (DFM) and filter out words that appear in less than 3% of the observations to remove explanatory variables with little data. This DFM is converted into a data frame featuring star-ratings (output) and the frequency of usage for each word (predictors) for a given review. 
+
+
+```{r include=FALSE}
+#8.0 DATA PREPARATION -- Create a Document Feature Matrix (go back to "review_train_small4", but remember to remove stop words here)
+
+##8.1 Install required packages
+install.packages("quanteda")
+library(quanteda)
+
+##8.2 Create a corpus
+corpus_review <- corpus(review_data_small4$clean_text, docnames = review_data_small4$review_id)
+summary(corpus_review)
+
+##8.3 Tokenise the text
+token_review <- tokens(corpus_review)
+
+##8.4 Create a Document Feature Matrix (this will take a pretty long time)
+DFM_review <- dfm(token_review) %>%
+  dfm_remove(c(stopwords(source="stopwords-iso"))) #remove stopwords from the premade stopword list "stopwords-iso" 
+
+##8.5 Remove stopwords
+Clean_DFM_review <- dfm_remove(DFM_review)
+
+##8.6 Trim DFM
+Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.03, docfreq_type = "prop") #remove features that appear in less than 3% of the reviews
+
+View(Trim_DFM_review) #View entire DFM
+Trim_DFM_review #view some features
+
+##8.7 Clear Memory
+rm(corpus_review)
+rm(token_review)
+rm(DFM_review)
+rm(Clean_DFM_review)
+#Keep Trim_DFM_review for now
+
+#9.0 DATA PREPARATION -- Create Matrix 
+
+##9.1 Convert DFM into a matrix containing only predictors (ie features and words)
+Matrix_DFM_review <- as.matrix(Trim_DFM_review) #IT WORKSSSSSSSSS
+
+###9.1.1 Clean Matrix by deleting the column containing the predictor variables "stars" and "star" as these are unlikely to give significant information, and instead complicate things due to them bearing the same/almost similar names as output variable
+Matrix_DFM_review2 <- subset(Matrix_DFM_review, select = -c(stars,star))
+
+##9.2 Acquire vector containing output (stars) from original training dataset "review_data_small4"
+stars_review <- subset(review_data_small4, select = c(2))
+
+##9.3 Join output with predictors
+Matrix_review <- cbind(stars_review,Matrix_DFM_review2)
+View(Matrix_review)
+#Output: A 698664 x 146 matrix
+
+##9.4 Clear Memory
+rm(Matrix_DFM_review)
+rm(Matrix_DFM_review2)
+rm(stars_review)
+rm(Trim_DFM_review)
+```
+
+```{r echo=FALSE}
+#9.5 Display top 10 rows
+head(Matrix_review, 10)
+```
+
+We split the data into a training dataset and a test dataset in a ratio of 3:1, ensuring that there are at least 10,000 observations in the test dataset to attain more accurate estimates of out-of-sample performance for evaluation. To ensure that models thoroughly learn meaningful patterns, we set the training dataset to be larger than the test dataset. 
+
+```{r include=FALSE} 
+#10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
+train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
+review_train <- Matrix_review[train,] #Training Data
+review_test<- Matrix_review[-train,] #Test Data
+
+##10.1 Clear Memory
+rm(train)
+rm(review_data_small4)
+rm(Matrix_review)
+
+##10.2 Within TRAINING data, split into predictors and output (stars)
+review_train_predictors <- review_train[,-1]
+review_train_stars <- review_train[,1]
+
+##10.3 Within TEST data, split into predictors and output (stars)
+review_test_predictors <- review_test[,-1]
+review_test_stars <- review_test[,1]
+```
+
+# 4) MODELLING AND EVALUATION
+## 4.1) ORDINARY LEAST-SQUARES (OLS) REGRESSION 
+Assuming a linear relationship between the frequency of usage for each word and the star-rating, we seek to minimise the difference between our predicted value and our actual value. Therefore, using the training data, we construct an OLS regression where the predicted star-rating for consumer i is: 
+
+$\hat{star}_{i}=\sum_{W = 1}^{p}\hat{\beta_{W}} X_{i,W}$, where $X_{i,W}$  is the number of times that word W was used by consumer i
+
+Where the OLS estimator $\hat{\beta_{W}^{OLS}}$ solves: 
+
+$argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2)$
+
+```{r include=FALSE}
+#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+
+##11.1 Construct linear regression of "stars" against "features"
+linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
+
+##11.2 Review results and coefficients
+summary(linreg_unreg_train)
+
+```
+
+Calculating the mean squared error (MSE), we get $MSE_{OLS}= 1.44264812413296$.
+
+```{r echo=FALSE}
+#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+
+##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
+linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
+
+##12.2 Calculate empirical Mean Squared Error in the TEST data
+linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
+
+sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44264812413296 
+```
+
+However, cognizant that OLS estimators are unbiased while incurring high variance, we are willing to use Shrinkage methods to incur bias and reduce variance to achieve greater prediction accuracy, so long as the reduction in variance is greater than the increase in bias. 
+
+
+## 4.2) RIDGE REGRESSION 
+Preserving the assumption of linearity, we conduct a Ridge regression by imposing a penalisation term on the estimator term, such that $\hat{\beta_{W}^{Ridge}}$ now solves:
+
+$argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2 + \lambda\sum_{W=1}^{p}\beta_{W}^2)$
+
+By penalising excessively large predictors, we reduce the model’s variance by shrinking the estimator coefficients, while retaining the same number of predictors as the OLS.
+
+Using cross-validation, we choose the $\lambda$ that minimises the MSE based on the training dataset, where $\lambda_{Ridge}= 0.03663183779814$. 
+
+```{r include=FALSE}
+#13.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##13.1 Install required packages
+install.packages("glmnet")
+library(glmnet)
+
+##13.2 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+
+###13.2.1
+cv.out.ridge <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=0, nfolds=10)
+```
+
+```{r echo=FALSE}
+###13.2.2 Plot lambda against MSE
+plot(cv.out.ridge)
+```
+
+```{r echo=FALSE}
+###13.2.3 Find lambda that minimises empirial MSE in training data set
+lambda_ridge_cv <- cv.out.ridge$lambda.min 
+
+sprintf((lambda_ridge_cv), fmt = '%#.14f')
+#Estimate = 0.03663183779814
+```
+
+
+Calculating the MSE, we get $MSE_{Ridge}=1.4425061026715$.
+
+```{r echo=FALSE}
+##13.3 Estimate Ridge with lambda chosen by Cross Validation
+ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda=lambda_ridge_cv, thresh=1e-12)
+
+
+#14.0 MODEL EVALUATION 2: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##14.1 Fit on test data
+ridge.pred <- predict(ridge.mod, s=lambda_ridge_cv, newx=as.matrix(review_test_predictors))
+ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
+
+sprintf((ridge_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44250610267150 
+```
+
+## 4.3) LASSO REGRESSION 
+Similarly, preserving the assumption of linearity, we conduct a LASSO regression by imposing a penalisation term on the estimator term, such that $\hat{\beta_{W}^{LASSO}}$ now solve:
+
+$argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2 + \lambda\sum_{W=1}^{p}|\beta_{W}|)$
+
+By penalising excessively large predictors, we force the model to reduce its variance by setting some estimator coefficients to 0 or shrinking them.  
+
+Using cross-validation, we choose the $\lambda$ that minimises the MSE based on the training dataset, where $\lambda_{LASSO}= 0.000543971165182985$.
+
+```{r include=FALSE}
+#15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
+
+#15.1 Conduct cross validation to find lambda that minimises empirical Mean Squared Error in training data
+cv.out.LASSO <- cv.glmnet(as.matrix(review_train_predictors), as.matrix(review_train_stars), alpha=1, nfolds=10)
+```
+
+```{r echo=FALSE}
+plot(cv.out.LASSO)
+```
+
+```{r echo=FALSE}
+###15.1.3 Find lambda that minimises empirial MSE in training data set
+lambda_LASSO_cv <- cv.out.LASSO$lambda.min 
+
+sprintf((lambda_LASSO_cv), fmt = '%#.14f')
+#Estimate = 0.00054397116518
+```
+
+
+Calculating the MSE, we get $MSE_{LASSO}= 1.44261530919753$.
+
+```{r echo=FALSE}
+##15.2 Estimate LASSO with lambda chosen by Cross Validation
+LASSO.mod <- glmnet(review_train_predictors, review_train_stars, alpha=1, lambda=lambda_LASSO_cv, thresh=1e-12)
+
+
+#16.0 MODEL EVALUATION 3: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
+
+##16.1 Fit on test data
+LASSO.pred <- predict(LASSO.mod, s=lambda_LASSO_cv, newx=as.matrix(review_test_predictors))
+LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
+
+sprintf((LASSO_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error = 1.44261530919753 
+```
+
+## 4.4) REGRESSION DECISION TREE 
+Assuming a non-linear relationship between the frequency of usage for each word and the star-rating, we construct a Regression Decision Tree from the training data, seeking to obtain an interpretable model to predict star-ratings. 
+
+```{r include=FALSE}
+#17.0 MODELLING 4: [TRAINING DATA] Regression Decision Tree 
+
+##17.1 Install required packages
+install.packages("tree")
+library(tree)
+install.packages("rpart")
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+install.packages("tidymodels")
+library(tidymodels)
+
+
+##17.2 Construct tree using rpart package
+rpart_tree <- rpart(stars ~ ., data=review_train)
+```
+
+
+```{r echo=FALSE}
+##17.3 Construct graph
+rpart.plot(rpart_tree)
+```
+
+We observe that customers who use the words “amazing”, “delicious”, “excellent”, and “awesome” — subject to their constraints — give a star-rating of at least 4.5. 
+
+Calculating the MSE, we get an estimated $MSE_{RegressionDecisionTree}= 2.67815955669566$.
+
+
+```{r echo=FALSE}
+#18.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
+
+##18.1 Make predictions and add to the test data
+regression_tree_prediction <- predict(rpart_tree,new_data=review_test) %>% 
+  cbind(review_test)
+View(regression_tree_prediction)
+
+##18.2 Evaluating Performance
+
+###18.2.1 Evaluating using mae (Mean Absolute Error)
+regression_tree_performance_mae <- mae(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_mae)
+#Finding: estimate = 1.355557
+
+###18.2.2 Evaluating using rmse (Root Mean Squared Error)
+regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = ".", truth=stars)
+
+View(regression_tree_performance_rmse)
+#Finding: estimate = 1.636508
+regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
+
+
+sprintf((regressiontree_MSE), fmt = '%#.14f')
+#Finding: Mean Squared Error (estimate) = 2.67815955669566 
+```
+
+# 5)	DISCUSSION & DEPLOYMENT
+Comparing the models, we observe that the Ridge Regression has the lowest MSE. Assessing that it is unfeasible to reduce MSE to 0 due to the presence of irreducible errors from the world’s natural randomness, we conclude that the Ridge is the most accurate model for out-of-sample predictions of consumer i’s star-ratings on business j. 
+
+| Model | MSE |
+|:-----|:-----:|
+|OLS| 1.44264812413296|
+|Ridge| 1.44250610267150|
+|LASSO| 1.44261530919753|
+|Regression Decision Tree| 2.67815955669566|
+
+The Ridge has the advantage of being intuitive and simple to use for businesses. Notably, businesses can observe the estimator coefficients and identify words such as “delicious”  (7th most positive estimator coefficient) that increase predicted star-ratings, thus improving areas that customers prioritise to maximise star-ratings. Additionally, according to other research, the Ridge’s assumption of linearity between star-ratings and reviews likely holds (Dong et al., 2020, p. 4). 
+
+However, a limitation is that the Ridge does not eliminate irrelevant predictors. Nonetheless, the small value of $\lambda_{Ridge}$ (0.03663183779814) likely implies that most predictors used were relevant. Additionally, this model assumes that words are not overly used such that the predicted output exceeds the [1,5] boundary.
+
+
+# 6) CHALLENGES
+The most difficult challenge encountered was the processing of huge volumes of data. Recognising that the original dataset contained over 7 million observations, the initial machine used was inadequate for conducting analysis, taking over 12 hours to run commands such as creating DFMs. Therefore, we circumvented this by creating a smaller-sized random sample and removing unused data frames to save machine memory.
+
+# 7) CONCLUSION 
+This research conducted textual analysis and concluded that the Ridge Regression generates the most accurate prediction of consumer i’s star-ratings for business j. Future research could consider adopting more complex non-linear models — such as bagging — to assess whether they are more useful compared to linear models in prediction. 
+
+## **Word Count:** 1250
+
+# **BIBLIOGRAPHY**
+
+1. AL-NATOUR, S. & TURETKEN, O. 2020. A comparative assessment of sentiment analysis and star ratings for consumer reviews. International Journal of Information Management, 54, 102132.
+2. DONG, J., CHEN, Y., GU, A., CHEN, J., LI, L., CHEN, Q., LI, S. & XUN, Q. 2020. Potential Trend for Online Shopping Data Based on the Linear Regression and Sentiment Analysis. Mathematical Problems in Engineering, 2020, 4591260.
+3. JABBOUR, D. 07 Apr 2023 2023. 3-Star Reviews Result In A -70% Decrease In Trust [Data Study]. Available from: https://gofishdigital.com/blog/3-star-reviews-result-in-70-decrease-in-trust-data-study/.
+4. POWERREVIEWS 2021. Survey: The Ever-Growing Power of Reviews. PowerReviews.
+5. ROLLINS, J. B. 2015. Foundational Methodology for Data Science. United States of America: IBM Corporation.
+6. SANTOS, J. 2003. E‐service quality: a model of virtual service quality dimensions. Managing service quality: An international journal, 13, 233-246.
+7. YELP 2023. Yelp Open Dataset. In: INC., Y. (ed.).
+
