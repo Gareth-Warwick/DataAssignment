@@ -189,9 +189,6 @@ rm(Matrix_DFM_review2)
 rm(stars_review)
 rm(Trim_DFM_review)
 
-#9.5 Display top 10 rows
-head(Matrix_review, 10)
-
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
 train <- sample(1:nrow(Matrix_review), 3*nrow(Matrix_review)/4) #split 3/4 and 1/4
@@ -212,7 +209,7 @@ review_test_predictors <- review_test[,-1]
 review_test_stars <- review_test[,1]
 
 
-#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+#11.0 MODELLING 1: [TRAINING DATA] OLS Linear Regression
 
 ##11.1 Construct linear regression of "stars" against "features"
 linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
@@ -221,7 +218,7 @@ linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regress
 summary(linreg_unreg_train)
 
 
-#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+#12.0 MODEL EVALUATION 1 [TEST DATA] OLS Linear Regression
 
 ##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
 linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
@@ -366,5 +363,5 @@ Ridge_overview <- Ridge_overview %>%
 Ridge_overview <- Ridge_overview %>%
   arrange(desc(Coefficient_Magnitude))
 
-##19.6 Display top 30 rows
-head(Ridge_overview, 30)
+##19.6 Display top 15 rows
+head(Ridge_overview, 15)
