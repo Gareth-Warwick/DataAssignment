@@ -1,6 +1,5 @@
 ---
-title: "Predicting User Star-Ratings on Businesses using Textual Analysis — Empirical
-  Evidence from Yelp"
+title: "Predicting User Star-Ratings on Businesses using Textual Analysis — Empirical Evidence from Yelp"
 author: "Gareth Pang (u2100906)"
 date: "2023-12-02"
 output:
