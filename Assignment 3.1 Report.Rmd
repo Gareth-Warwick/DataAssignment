@@ -569,6 +569,7 @@ head(Ridge_overview, 15)
 
 However, a limitation is that the Ridge does not eliminate irrelevant predictors. Nonetheless, the small value of $\lambda_{Ridge}$ (0.03663183779814) likely implies that most predictors used were relevant. Additionally, this model assumes that words are not overly used such that the predicted output exceeds the [1,5] boundary.
 
+\newpage
 
 # 6) CHALLENGES
 The most difficult challenge encountered was the processing of huge volumes of data. Recognising that the original dataset contained over 7 million observations, the initial machine used was inadequate for conducting analysis, taking over 12 hours to run commands such as creating DFMs. Therefore, we circumvented this by creating a smaller-sized random sample and removing unused data frames to save machine memory.
