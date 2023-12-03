@@ -8,6 +8,8 @@ output:
 subtitle: "GitHub Link: https://github.com/Gareth-Warwick/DataAssignment"
 ---
 
+\newpage
+
 # Tabula Statement
 
 We're part of an academic community at Warwick.
@@ -28,18 +30,18 @@ The data on this form relates to your submission of coursework. The date and tim
 
 Related articles
 
-1. [Reg. 11 Academic Integrity (from 4 Oct 2021)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Fgov%2Fcalendar%2Fsection2%2Fregulations%2Facademic_integrity%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290873980%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=sWd0P%2BD8DesgsbpH2q3NZLjtzmsCsSBfJT4sAnud3cM%3D&reserved=0)
-2. [Guidance on Regulation 11](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290882201%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=BHquE0ZFLXykoH5jpZFBtbsDh0DLAUpAISE8Ekl0cr0%3D&reserved=0)
-3. [Proofreading Policy](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Fcategories%2Fexaminations%2Fpolicies%2Fv_proofreading%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290888239%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=RXdvlCKAHDR0bb3nSZrUXR%2BkII2tGklRDWL62G8zf4E%3D&reserved=0)  
-4. [Education Policy and Quality Team](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290893237%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Ixpo1EBxPOhE8geWyKXz6MnYx9lvJ%2Bxtm4avSgxd4VU%3D&reserved=0)
-5. [Academic Integrity (warwick.ac.uk)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fstudents%2Flearning-experience%2Facademic_integrity&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290898198%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IFBZVPUF0whAbjAp7EgL%2BOmm3LQ7O26SmZQqjQrZ50E%3D&reserved=0)
+1. [Reg. 11 Academic Integrity (from 4 Oct 2021)](https://warwick.ac.uk/services/gov/calendar/section2/regulations/academic_integrity/)
+2. [Guidance on Regulation 11](https://warwick.ac.uk/services/aro/dar/quality/az/acintegrity/framework/guidancereg11/)
+3. [Proofreading Policy](https://warwick.ac.uk/services/aro/dar/quality/categories/examinations/policies/v_proofreading/)
+4. [Education Policy and Quality Team](https://warwick.ac.uk/services/aro/dar/quality/az/acintegrity/framework/guidancereg11/)
+5. [Academic Integrity (warwick.ac.uk)](https://warwick.ac.uk/students/learning-experience/academic_integrity)
 
 \newpage
 
 # 1) INTRODUCTION
-With online platforms facilitating costless comparison of businesses for consumers (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising businesses as they influence customers’ trust in businesses (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
+With online platforms facilitating costless comparison of businesses (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising firms as they influence public perceptions of firms’ reliability and customers’ subsequent willingness to consume (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
 
-Therefore, this research seeks to conduct a textual analysis of consumers’ reviews to predict businesses’ star-ratings. This research is relevant for businesses seeking to identify and improve key attributes that are prioritised by customers in their reviews, thus boosting their star-ratings and attracting customers to maximise profits.
+Therefore, this research seeks to conduct a textual analysis of consumers’ reviews to predict businesses’ star-ratings. Compared to conventional sentiment analysis, we postulate that textual analysis is more relevant for businesses as it clearly identifies key attributes that are prioritised by customers in reviews, allowing businesses to make targeted investments and boost their star-ratings to attract customers and maximise profits. 
 
 This report comprises 5 sections: Section 2 explains the Data Science Methodology, Section 3 prepares the data, and Section 4 constructs and evaluates 4 prediction models. Section 5 assesses the chosen model’s deployment, while Section 6 addresses difficulties encountered.
 
@@ -332,7 +334,7 @@ Where the OLS estimator $\hat{\beta_{W}^{OLS}}$ solves:
 $argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2)$
 
 ```{r include=FALSE}
-#11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
+#11.0 MODELLING 1: [TRAINING DATA] OLS Linear Regression
 
 ##11.1 Construct linear regression of "stars" against "features"
 linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regression
@@ -345,7 +347,7 @@ summary(linreg_unreg_train)
 Calculating the mean squared error (MSE), we get $MSE_{OLS}= 1.44264812413296$.
 
 ```{r echo=FALSE}
-#12.0 MODEL EVALUATION 1 [TEST DATA] Unregularised Linear Regression
+#12.0 MODEL EVALUATION 1 [TEST DATA] OLS Linear Regression
 
 ##12.1 Fit model onto test data (exclude first column which is the outcome) to generate predicted value
 linreg_unreg_predict <- predict(linreg_unreg_train, newdata=review_test[,-1]) 
@@ -359,6 +361,7 @@ sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
 
 However, cognizant that OLS estimators are unbiased while incurring high variance, we are willing to use Shrinkage methods to incur bias and reduce variance to achieve greater prediction accuracy, so long as the reduction in variance is greater than the increase in bias. 
 
+\newpage
 
 ## 4.2) RIDGE REGRESSION 
 Preserving the assumption of linearity, we conduct a Ridge regression by imposing a penalisation term on the estimator term, such that $\hat{\beta_{W}^{Ridge}}$ now solves:
@@ -396,7 +399,7 @@ sprintf((lambda_ridge_cv), fmt = '%#.14f')
 ```
 
 
-Calculating the MSE, we get $MSE_{Ridge}=1.4425061026715$.
+Calculating the MSE, we get $MSE_{Ridge}=1.44250610267150$.
 
 ```{r echo=FALSE}
 ##13.3 Estimate Ridge with lambda chosen by Cross Validation
@@ -413,6 +416,8 @@ sprintf((ridge_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44250610267150 
 ```
 
+\newpage
+
 ## 4.3) LASSO REGRESSION 
 Similarly, preserving the assumption of linearity, we conduct a LASSO regression by imposing a penalisation term on the estimator term, such that $\hat{\beta_{W}^{LASSO}}$ now solve:
 
@@ -420,7 +425,7 @@ $argmin_\beta (\sum_{i = 1}^{n}(Y_{i} - X_{i}'\beta)^2 + \lambda\sum_{W=1}^{p}|\
 
 By penalising excessively large predictors, we force the model to reduce its variance by setting some estimator coefficients to 0 or shrinking them.  
 
-Using cross-validation, we choose the $\lambda$ that minimises the MSE based on the training dataset, where $\lambda_{LASSO}= 0.000543971165182985$.
+Using cross-validation, we choose the $\lambda$ that minimises the MSE based on the training dataset, where $\lambda_{LASSO}= 0.00054397116518$.
 
 ```{r include=FALSE}
 #15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
@@ -458,6 +463,8 @@ LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
 sprintf((LASSO_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44261530919753 
 ```
+
+\newpage
 
 ## 4.4) REGRESSION DECISION TREE 
 Assuming a non-linear relationship between the frequency of usage for each word and the star-rating, we construct a Regression Decision Tree from the training data, seeking to obtain an interpretable model to predict star-ratings. 
@@ -526,12 +533,39 @@ Comparing the models, we observe that the Ridge Regression has the lowest MSE. A
 
 | Model | MSE |
 |:-----:|:-----:|
-|OLS| 1.44264812413296|
+|OLS| 1.44264812413295|
 |Ridge| 1.44250610267150|
 |LASSO| 1.44261530919753|
 |Regression Decision Tree| 2.67815955669566|
 
-The Ridge has the advantage of being intuitive and simple to use for businesses. Notably, businesses can observe the estimator coefficients and identify words such as “delicious”  (7th most positive estimator coefficient) that increase predicted star-ratings, thus improving areas that customers prioritise to maximise star-ratings. Additionally, according to other research, the Ridge’s assumption of linearity between star-ratings and reviews likely holds (Dong et al., 2020, p. 4). 
+The Ridge has the advantage of being intuitive and simple to use for businesses. Notably, businesses can observe estimator coefficients and identify words like “delicious” (8th largest estimator coefficient in absolute terms) that increase predicted star-ratings, consequently improving areas that customers prioritise to maximise star-ratings. Additionally, according to other research, the Ridge’s assumption of linearity between star-ratings and reviews likely holds (Dong et al., 2020, p. 4). 
+
+```{r include=FALSE}
+#19.0 Obtain coefficients of Ridge
+
+##19.1 Extract coefficients from Ridge model (exclude intercept which is in column 1)
+Ridge_coefficients <- coef(ridge.mod)[-1]
+
+##19.2 Extract feature names from Ridge model (obtained from review_train_predictors)
+Ridge_features <- colnames(as.matrix(review_train_predictors))
+
+##19.3 Combine coefficients and feature names
+Ridge_overview <- data.frame(Coefficient = as.matrix(Ridge_coefficients), Feature_Name = Ridge_features)
+
+##19.4 Add a column for absolute coefficient magnitude
+Ridge_overview <- Ridge_overview %>%
+  mutate(Coefficient_Magnitude = abs(Coefficient))
+
+##19.5 Sort the data frame by coefficient magnitude in descending order
+Ridge_overview <- Ridge_overview %>%
+  arrange(desc(Coefficient_Magnitude))
+```
+
+```{r echo=FALSE}
+##19.6 Display top 15 rows
+head(Ridge_overview, 15)
+```
+
 
 However, a limitation is that the Ridge does not eliminate irrelevant predictors. Nonetheless, the small value of $\lambda_{Ridge}$ (0.03663183779814) likely implies that most predictors used were relevant. Additionally, this model assumes that words are not overly used such that the predicted output exceeds the [1,5] boundary.
 
@@ -542,7 +576,7 @@ The most difficult challenge encountered was the processing of huge volumes of d
 # 7) CONCLUSION 
 This research conducted textual analysis and concluded that the Ridge Regression generates the most accurate prediction of consumer i’s star-ratings for business j. Future research could consider adopting more complex non-linear models — such as bagging — to assess whether they are more useful compared to linear models in prediction. 
 
-## **Word Count:** 1246
+## **Word Count:** 1250
 
 \newpage
 
