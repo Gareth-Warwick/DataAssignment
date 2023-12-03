@@ -1,7 +1,7 @@
 #1.0 Setting up
 
 ##1.1 Setting Working Directory
-setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0")
+setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0/EC349 Assignment 3.0")
 
 ##1.2 Download and Load Tidyverse Package
 install.packages("tidyverse") 
@@ -140,12 +140,12 @@ View(overall_stars_text_count)
 overall_stars_text_count %>%
   filter(n > 0.5*length(cleaned_tokenized_review)) %>%
   mutate(word = reorder(word, n)) %>%
-  slice_max(order_by=n,n=100) %>% #Select the top 100 words 
+  slice_max(order_by=n,n=50) %>% #Select the top 50 words 
   ggplot(aes(word, 0.5*length(cleaned_tokenized_review), fill = stars)) +
   geom_col() +
   coord_flip() +
   labs(y = "Contribution to stars rating")
-#Finding: Based on the top 100 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
+#Finding: Based on the top 50 words that impact star ratings (ie frequency of word used), we expect these words to be useful indicators of a user's eventual star rating
 #--> In terms of tangible business attributes, "food", "service", "staff", friendly", "delicious", "restaurant", "experience" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
 
 
