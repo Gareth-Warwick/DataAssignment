@@ -35,6 +35,8 @@ Related articles
 4. [Education Policy and Quality Team](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290893237%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Ixpo1EBxPOhE8geWyKXz6MnYx9lvJ%2Bxtm4avSgxd4VU%3D&reserved=0)
 5. [Academic Integrity (warwick.ac.uk)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fstudents%2Flearning-experience%2Facademic_integrity&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290898198%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IFBZVPUF0whAbjAp7EgL%2BOmm3LQ7O26SmZQqjQrZ50E%3D&reserved=0)
 
+\newpage
+
 # 1) INTRODUCTION
 With online platforms facilitating costless comparison of businesses for consumers (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising businesses as they influence customers’ trust in businesses (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
 
@@ -46,6 +48,8 @@ This report comprises 5 sections: Section 2 explains the Data Science Methodolog
 This research uses John Rollins’ Data Science Methodology (Figure 1) due to it being better able — compared to other methodologies — to incorporate new practices in data science such as the usage of big data and the conducting of textual analysis (Rollins, 2015, p. 2). Additionally, the methodology’s iterative feature allows for constant re-collection and re-processing of data (Rollins, 2015, p. 5), enabling the tuning of models to be more accurate in prediction. Hence, this project will be structured according to the methodology.
 
 ![_Figure 1: Foundational Methodology for Data Science (Rollins, 2015, p. 3)_](https://miro.medium.com/v2/resize:fit:623/1*nlMfVD6k_s9xWN0QACLUPQ.png)
+
+\newpage
 
 # 3) DATA 
 
@@ -316,6 +320,8 @@ review_test_predictors <- review_test[,-1]
 review_test_stars <- review_test[,1]
 ```
 
+\newpage
+
 # 4) MODELLING AND EVALUATION
 ## 4.1) ORDINARY LEAST-SQUARES (OLS) REGRESSION 
 Assuming a linear relationship between the frequency of usage for each word and the star-rating, we seek to minimise the difference between our predicted value and our actual value. Therefore, using the training data, we construct an OLS regression where the predicted star-rating for consumer i is: 
@@ -514,6 +520,8 @@ sprintf((regressiontree_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error (estimate) = 2.67815955669566 
 ```
 
+\newpage
+
 # 5)	DISCUSSION & DEPLOYMENT
 Comparing the models, we observe that the Ridge Regression has the lowest MSE. Assessing that it is unfeasible to reduce MSE to 0 due to the presence of irreducible errors from the world’s natural randomness, we conclude that the Ridge is the most accurate model for out-of-sample predictions of consumer i’s star-ratings on business j. 
 
@@ -536,6 +544,8 @@ The most difficult challenge encountered was the processing of huge volumes of d
 This research conducted textual analysis and concluded that the Ridge Regression generates the most accurate prediction of consumer i’s star-ratings for business j. Future research could consider adopting more complex non-linear models — such as bagging — to assess whether they are more useful compared to linear models in prediction. 
 
 ## **Word Count:** 1246
+
+\newpage
 
 # **BIBLIOGRAPHY**
 
