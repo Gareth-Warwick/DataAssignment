@@ -7,10 +7,9 @@ setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assig
 install.packages("tidyverse") 
 library(tidyverse)
 
-#1.3 Clear
+##1.3 Clear
 cat("\014")  
 rm(list=ls())
-
 
 ##1.4 Set seed to control randomisation
 set.seed(1)
