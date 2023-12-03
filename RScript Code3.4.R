@@ -15,9 +15,6 @@ rm(list=ls())
 set.seed(1)
 
 
-
-
-
 #2.0 DATA COLLECTION: Loading the data into computer
 
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
@@ -45,14 +42,11 @@ tabyl(review_data_clean$stars, sort=TRUE)
 summary(review_data_clean)
 
 
-
-
 #4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
 randomsample <- sample(1:nrow(review_data_clean), 1*nrow(review_data_clean)/2)
 review_data_small2 <- review_data_clean[randomsample,]
 
-
-#4.1 Clear Memory
+##4.1 Clear Memory
 rm(randomsample)
 rm(review_data_clean)
 
@@ -63,13 +57,8 @@ rm(review_data_clean)
 review_data_small3 <- subset(review_data_small2, select = c(1,4,8) )
 View(review_data_small3)
 
-
 ##5.2 Clearing Memory
 rm(review_data_small2)
-
-
-
-
 
 
 #6.0 DATA PREPARATION: clean the text
@@ -81,7 +70,6 @@ review_data_small3 <- review_data_small3 |>
     clean_text = gsub("[[:space:]]+", " ", clean_text), #replaces multiple consecutive whitespace characters (spaces/tabs/newlines) with single spaces, ensuring consistent spacing between words
     clean_text = gsub("[[:digit:]]", "", clean_text), #removes digits
     clean_text = trimws(clean_text)) #trims any leading or trailing whitespace from the beginning and end of each word, ensuring that words are represented in a consistent manner
-
 
 ##6.1 Remove duplicate rows with duplicates in clean_text (again)
 review_data_small3clean <- review_data_small3 %>%
@@ -98,7 +86,6 @@ View(review_data_small4)
 rm(review_data_small3clean)
 
 
-
 #7.0 DATA UNDERSTANDING
 
 ##7.1 Install required packages
@@ -108,7 +95,6 @@ install.packages("tidytext")
 library(tidytext)
 
 ##7.2 TOKENIZE THE TEXT
-#Consider filtering out redundant words
 tokenized_review <- review_data_small4 %>%
   unnest_tokens(input = clean_text, output = word)
 
@@ -123,7 +109,6 @@ cleaned_tokenized_review <- tokenized_review %>%
 
 ##7.4 Clear memory
 rm(tokenized_review)
-
 
 ##7.5 Count and sort most common words
 cleaned_tokenized_review %>%
@@ -150,7 +135,6 @@ overall_stars_text_count %>%
 
 #8.0 DATA PREPARATION -- Create a Document Feature Matrix (go back to "review_train_small4", but remember to remove stop words here)
 
-
 ##8.1 Install required packages
 install.packages("quanteda")
 library(quanteda)
@@ -175,14 +159,12 @@ Trim_DFM_review <- dfm_trim(Clean_DFM_review, min_docfreq = 0.03, docfreq_type =
 View(Trim_DFM_review) #View entire DFM
 Trim_DFM_review #view some features
 
-
 ##8.7 Clear Memory
 rm(corpus_review)
 rm(token_review)
 rm(DFM_review)
 rm(Clean_DFM_review)
 #Keep Trim_DFM_review for now
-
 
 
 #9.0 DATA PREPARATION -- Create Matrix 
@@ -196,13 +178,10 @@ Matrix_DFM_review2 <- subset(Matrix_DFM_review, select = -c(stars,star))
 ##9.2 Acquire vector containing output (stars) from original training dataset "review_data_small4"
 stars_review <- subset(review_data_small4, select = c(2))
 
-
-
 ##9.3 Join output with predictors
 Matrix_review <- cbind(stars_review,Matrix_DFM_review2)
 View(Matrix_review)
 #Output: A 698664 x 146 matrix
-
 
 ##9.4 Clear Memory
 rm(Matrix_DFM_review)
@@ -212,10 +191,6 @@ rm(Trim_DFM_review)
 
 #9.5 Display top 10 rows
 head(Matrix_review, 10)
-
-
-
-
 
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
@@ -237,8 +212,6 @@ review_test_predictors <- review_test[,-1]
 review_test_stars <- review_test[,1]
 
 
-
-
 #11.0 MODELLING 1: [TRAINING DATA] Unregularised Linear Regression
 
 ##11.1 Construct linear regression of "stars" against "features"
@@ -258,10 +231,6 @@ linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
 
 sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44264812413296 
-
-
-
-
 
 
 #13.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- Ridge Linear Regression
@@ -290,8 +259,6 @@ ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda
 summary(ridge.mod)
 
 
-
-
 #14.0 MODEL EVALUATION 2: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
 
 ##14.1 Fit on test data
@@ -300,7 +267,6 @@ ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
 
 sprintf((ridge_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44250610267150 
-
 
 
 #15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
@@ -319,13 +285,10 @@ lambda_LASSO_cv <- cv.out.LASSO$lambda.min
 sprintf((lambda_LASSO_cv), fmt = '%#.14f')
 #Estimate = 0.00054397116518
 
-
 ##15.2 Estimate LASSO with lambda chosen by Cross Validation
 LASSO.mod <- glmnet(review_train_predictors, review_train_stars, alpha=1, lambda=lambda_LASSO_cv, thresh=1e-12)
 
 summary(LASSO.mod)
-
-
 
 
 #16.0 MODEL EVALUATION 3: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
@@ -339,14 +302,6 @@ sprintf((LASSO_MSE), fmt = '%#.14f')
 #Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.4425061026715, ridge is a better prediction model in this case
 
 
-
-
-
-
-
-
-
-
 #17.0 MODELLING 4: [TRAINING DATA] Regression Decision Tree 
 
 ##17.1 Install required packages
@@ -358,7 +313,6 @@ install.packages("rpart.plot")
 library(rpart.plot)
 install.packages("tidymodels")
 library(tidymodels)
-
 
 ##17.2 Construct tree using rpart package
 rpart_tree <- rpart(stars ~ ., data=review_train)
@@ -391,8 +345,6 @@ regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
 
 sprintf((regressiontree_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error (estimate) = 2.67815955669566 
-
-
 
 
 #19.0 Obtain coefficients of Ridge
