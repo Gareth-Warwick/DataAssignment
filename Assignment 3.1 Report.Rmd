@@ -1,5 +1,5 @@
 ---
-title: "Predicting User Star-Ratings on Businesses using Text Analysis — Empirical
+title: "Predicting User Star-Ratings on Businesses using Textual Analysis — Empirical
   Evidence from Yelp"
 author: "Gareth Pang (u2100906)"
 date: "2023-12-02"
@@ -30,13 +30,9 @@ The data on this form relates to your submission of coursework. The date and tim
 Related articles
 
 1. [Reg. 11 Academic Integrity (from 4 Oct 2021)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Fgov%2Fcalendar%2Fsection2%2Fregulations%2Facademic_integrity%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290873980%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=sWd0P%2BD8DesgsbpH2q3NZLjtzmsCsSBfJT4sAnud3cM%3D&reserved=0)
-
 2. [Guidance on Regulation 11](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290882201%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=BHquE0ZFLXykoH5jpZFBtbsDh0DLAUpAISE8Ekl0cr0%3D&reserved=0)
-
 3. [Proofreading Policy](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Fcategories%2Fexaminations%2Fpolicies%2Fv_proofreading%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290888239%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=RXdvlCKAHDR0bb3nSZrUXR%2BkII2tGklRDWL62G8zf4E%3D&reserved=0)  
-
 4. [Education Policy and Quality Team](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fservices%2Faro%2Fdar%2Fquality%2Faz%2Facintegrity%2Fframework%2Fguidancereg11%2F&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290893237%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Ixpo1EBxPOhE8geWyKXz6MnYx9lvJ%2Bxtm4avSgxd4VU%3D&reserved=0)
-
 5. [Academic Integrity (warwick.ac.uk)](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwarwick.ac.uk%2Fstudents%2Flearning-experience%2Facademic_integrity&data=05%7C01%7CGareth.Pang%40warwick.ac.uk%7C132df8381db44288ef1608dbf192271d%7C09bacfbd47ef446592653546f2eaf6bc%7C0%7C0%7C638369382290898198%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IFBZVPUF0whAbjAp7EgL%2BOmm3LQ7O26SmZQqjQrZ50E%3D&reserved=0)
 
 # 1) INTRODUCTION
@@ -63,7 +59,7 @@ options(repos = c(CRAN = "https://cran.rstudio.com"))
 #1.0 Setting up
 
 ##1.1 Setting Working Directory
-setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0")
+setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0/EC349 Assignment 3.0")
 
 ##1.2 Download and Load Tidyverse Package
 install.packages("tidyverse") 
@@ -206,7 +202,7 @@ rm(tokenized_review)
 
 From the data, we observe that individual words are often associated with multiple star-ratings. Hence, our model will predict star-ratings based on the combined effect of multiple words within a singular review.
 
-```{r echo=FALSE}
+```{r include=FALSE}
 ##7.5 Count and sort most common words
 cleaned_tokenized_review %>%
   count(word, sort = TRUE) 
@@ -216,12 +212,14 @@ overall_stars_text_count <- cleaned_tokenized_review %>%
   count(word, stars, sort = TRUE)
 
 View(overall_stars_text_count)
+```
 
+```{r echo=FALSE}
 ##7.7 Visualise
 overall_stars_text_count %>%
   filter(n > 0.5*length(cleaned_tokenized_review)) %>%
   mutate(word = reorder(word, n)) %>%
-  slice_max(order_by=n,n=50) %>% #Select the top 100 words 
+  slice_max(order_by=n,n=50) %>% #Select the top 50 words 
   ggplot(aes(word, 0.5*length(cleaned_tokenized_review), fill = stars)) +
   geom_col() +
   coord_flip() +
@@ -291,7 +289,7 @@ rm(stars_review)
 rm(Trim_DFM_review)
 ```
 
-```{r echo=FALSE}
+```{r include=FALSE}
 #9.5 Display top 10 rows
 head(Matrix_review, 10)
 ```
@@ -520,7 +518,7 @@ sprintf((regressiontree_MSE), fmt = '%#.14f')
 Comparing the models, we observe that the Ridge Regression has the lowest MSE. Assessing that it is unfeasible to reduce MSE to 0 due to the presence of irreducible errors from the world’s natural randomness, we conclude that the Ridge is the most accurate model for out-of-sample predictions of consumer i’s star-ratings on business j. 
 
 | Model | MSE |
-|:-----|:-----:|
+|:-----:|:-----:|
 |OLS| 1.44264812413296|
 |Ridge| 1.44250610267150|
 |LASSO| 1.44261530919753|
@@ -537,7 +535,7 @@ The most difficult challenge encountered was the processing of huge volumes of d
 # 7) CONCLUSION 
 This research conducted textual analysis and concluded that the Ridge Regression generates the most accurate prediction of consumer i’s star-ratings for business j. Future research could consider adopting more complex non-linear models — such as bagging — to assess whether they are more useful compared to linear models in prediction. 
 
-## **Word Count:** 1250
+## **Word Count:** 1246
 
 # **BIBLIOGRAPHY**
 
