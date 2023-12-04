@@ -572,7 +572,7 @@ However, a limitation is that the Ridge does not eliminate irrelevant predictors
 \newpage
 
 # 6) CHALLENGES
-The most difficult challenge encountered was the processing of huge volumes of data. Recognising that the original dataset contained over 7 million observations, the initial machine used was inadequate for conducting analysis, taking over 12 hours to run commands such as creating DFMs. Therefore, we circumvented this by creating a smaller-sized random sample and removing unused data frames to save machine memory.
+The most difficult challenge encountered was the processing of huge volumes of data. Recognising that the original dataset contained over 7 million observations, the machine used had insufficient memory to conduct analysis, taking over 12 hours to run commands such as creating DFMs. Therefore, we circumvented this by creating a smaller-sized random sample and removing unused data frames to save machine memory.
 
 # 7) CONCLUSION 
 This research conducted textual analysis and concluded that the Ridge Regression generates the most accurate prediction of consumer i’s star-ratings for business j. Future research could consider adopting more complex non-linear models — such as bagging — to assess whether they are more useful compared to linear models in prediction. 
