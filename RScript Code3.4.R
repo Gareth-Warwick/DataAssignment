@@ -15,6 +15,7 @@ rm(list=ls())
 set.seed(1)
 
 
+
 #2.0 DATA COLLECTION: Loading the data into computer
 
 ##2.1 Load the .RDA data for users and reviews (these are the smaller datasets as I couldn't load the big ones)
@@ -33,6 +34,7 @@ review_data_clean <- review_data_small %>%
 rm(review_data_small)
 
 
+
 #3.0 DATA UNDERSTANDING: View summary of star ratings 
 install.packages("janitor")
 library(janitor)
@@ -40,6 +42,7 @@ tabyl(review_data_clean$stars, sort=TRUE)
 #Output: We observe that there is skewed result toward 1-star, 4-star, and 5-star --> (1star: 15.28% | 2star: 7.82% | 3star: 9.92% | 4 star: 20.78% | 5star: 46.21%)
 
 summary(review_data_clean)
+
 
 
 #4.0 DATA PREPARATION: Get a random sample from the population data (half of the population data which is around 699,028) --> due to machine constraints where the machine is unable to process too large datasets
@@ -51,6 +54,7 @@ rm(randomsample)
 rm(review_data_clean)
 
 
+
 #5.0 DATA PREPARATION: Filter the data
 
 ##5.1 In review_data_small --> only extract relevant columns (1:review_id // 4:stars // 8:text)
@@ -59,6 +63,7 @@ View(review_data_small3)
 
 ##5.2 Clearing Memory
 rm(review_data_small2)
+
 
 
 #6.0 DATA PREPARATION: clean the text
@@ -84,6 +89,7 @@ View(review_data_small4)
 
 ##6.4 Clear memory
 rm(review_data_small3clean)
+
 
 
 #7.0 DATA UNDERSTANDING
@@ -133,6 +139,7 @@ overall_stars_text_count %>%
 #--> In terms of tangible business attributes, "food", "service", "staff", friendly", "delicious", "restaurant", "experience" are within the top 100 words that have the largest contribution to star rating (due to their highest usage)
 
 
+
 #8.0 DATA PREPARATION -- Create a Document Feature Matrix (go back to "review_train_small4", but remember to remove stop words here)
 
 ##8.1 Install required packages
@@ -167,10 +174,11 @@ rm(Clean_DFM_review)
 #Keep Trim_DFM_review for now
 
 
+
 #9.0 DATA PREPARATION -- Create Matrix 
 
 ##9.1 Convert DFM into a matrix containing only predictors (ie features and words)
-Matrix_DFM_review <- as.matrix(Trim_DFM_review) #IT WORKSSSSSSSSS
+Matrix_DFM_review <- as.matrix(Trim_DFM_review) 
 
 ###9.1.1 Clean Matrix by deleting the column containing the predictor variables "stars" and "star" as these are unlikely to give significant information, and instead complicate things due to them bearing the same/almost similar names as output variable
 Matrix_DFM_review2 <- subset(Matrix_DFM_review, select = -c(stars,star))
@@ -188,6 +196,7 @@ rm(Matrix_DFM_review)
 rm(Matrix_DFM_review2)
 rm(stars_review)
 rm(Trim_DFM_review)
+
 
 
 #10.0 DATA PREPARATION: SPLIT INTO TRAINING AND TEST
@@ -209,6 +218,7 @@ review_test_predictors <- review_test[,-1]
 review_test_stars <- review_test[,1]
 
 
+
 #11.0 MODELLING 1: [TRAINING DATA] OLS Linear Regression
 
 ##11.1 Construct linear regression of "stars" against "features"
@@ -216,6 +226,7 @@ linreg_unreg_train <- lm(stars~ ., data=review_train) #create the linear regress
 
 ##11.2 Review results and coefficients
 summary(linreg_unreg_train)
+
 
 
 #12.0 MODEL EVALUATION 1 [TEST DATA] OLS Linear Regression
@@ -228,6 +239,7 @@ linreg_unreg_test_MSE <- mean((linreg_unreg_predict-review_test$stars)^2)
 
 sprintf((linreg_unreg_test_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44264812413296 
+
 
 
 #13.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- Ridge Linear Regression
@@ -256,6 +268,7 @@ ridge.mod <- glmnet(review_train_predictors, review_train_stars, alpha=0, lambda
 summary(ridge.mod)
 
 
+
 #14.0 MODEL EVALUATION 2: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
 
 ##14.1 Fit on test data
@@ -264,6 +277,7 @@ ridge_MSE <- mean((ridge.pred-review_test_stars)^2)
 
 sprintf((ridge_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44250610267150 
+
 
 
 #15.0 MODELLING 2: [TRAINING DATA] Shrinkage Methods -- LASSO Linear Regression
@@ -288,6 +302,7 @@ LASSO.mod <- glmnet(review_train_predictors, review_train_stars, alpha=1, lambda
 summary(LASSO.mod)
 
 
+
 #16.0 MODEL EVALUATION 3: [TEST DATA] Shrinkage Methods -- Ridge Linear Regression
 
 ##16.1 Fit on test data
@@ -296,7 +311,8 @@ LASSO_MSE <- mean((LASSO.pred-review_test_stars)^2)
 
 sprintf((LASSO_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error = 1.44261530919753 
-#Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.4425061026715, ridge is a better prediction model in this case
+#Nonetheless, since OLS_MSE = 1.44264812413296 > LASSO_MSE = 1.44261530919753 > ridge_MSE = 1.44250610267150, ridge is a better prediction model in this case
+
 
 
 #17.0 MODELLING 4: [TRAINING DATA] Regression Decision Tree 
@@ -316,6 +332,7 @@ rpart_tree <- rpart(stars ~ ., data=review_train)
 
 ##17.3 Construct graph
 rpart.plot(rpart_tree)
+
 
 
 #18.0 MODEL EVALUATION 4: [TEST DATA] Regression Decision Tree
@@ -342,6 +359,7 @@ regressiontree_MSE <- (regression_tree_performance_rmse$.estimate)^2
 
 sprintf((regressiontree_MSE), fmt = '%#.14f')
 #Finding: Mean Squared Error (estimate) = 2.67815955669566 
+
 
 
 #19.0 Obtain coefficients of Ridge
