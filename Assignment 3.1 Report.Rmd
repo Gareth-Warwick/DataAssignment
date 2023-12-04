@@ -41,7 +41,7 @@ Related articles
 # 1) INTRODUCTION
 With online platforms facilitating costless comparison of businesses (Santos, 2003, pp. 233-235), star-ratings — a measure of business performance — are increasingly important for profit-maximising firms as they influence public perceptions of firms’ reliability and customers’ subsequent willingness to consume (Jabbour, 2023). Additionally, with 52% of customers being sceptical of star-ratings unaccompanied by reviews (PowerReviews, 2021), customers likely see the review content as an important justification for the star-rating.
 
-Therefore, this research seeks to conduct a textual analysis of consumers’ reviews to predict businesses’ star-ratings. Compared to conventional sentiment analysis, we postulate that textual analysis is more relevant for businesses as it clearly identifies key attributes that are prioritised by customers in reviews, allowing businesses to make targeted investments and boost their star-ratings to attract customers and maximise profits. 
+Therefore, this research conducts a textual analysis of reviews to predict star-ratings given by consumers to businesses. Unlike conventional sentiment analysis, we postulate that textual analysis is more relevant for businesses as it clearly identifies key attributes that are prioritised by customers in reviews, allowing businesses to make targeted investments and boost their star-ratings to attract customers and maximise profits. 
 
 This report comprises 5 sections: Section 2 explains the Data Science Methodology, Section 3 prepares the data, and Section 4 constructs and evaluates 4 prediction models. Section 5 assesses the chosen model’s deployment, while Section 6 addresses difficulties encountered.
 
@@ -105,7 +105,7 @@ View(review_data_small)
 
 As our machine was unable to process the original large dataset, we imported a pre-made smaller dataset _“review_data_small”_ and took a random sample which served as an unbiased representation of the population. We acknowledge that precision may be lost due to fewer observations being captured, but the expensive solution of increasing the machine’s Random-Access Memory was unfeasible given our resource constraints. 
 
-We removed all reviews which contained no text as they served no informative function. Furthermore, we removed all observations containing duplicated reviews, preserving only 1 review to avoid contradictions where the same input generates different output. 
+We removed all observations which contained empty reviews as they served no informative function. Furthermore, we removed all observations containing duplicated reviews, preserving only 1 review to avoid potential contradictions where the same input generates different output. 
 
 
 ```{r include=FALSE}
@@ -141,7 +141,7 @@ rm(review_data_clean)
 
 We treat star-ratings as a continuous variable to account for variance that is lost when treating star-ratings as a categorical variable (Al-Natour and Turetken, 2020, p. 2), thereby enhancing the models’ performances. Additionally, treating star-ratings as continuous enables businesses to better visualise how specific words used in reviews affect predicted star-ratings. 
 
-We clean the text by converting it into lowercase text without any digits and punctuation, before tokenising the text and removing stopwords — which are words that provide little information — using the pre-made stopword list _“stopwords-iso”_ due to it being the most comprehensive.
+We clean the text by converting it into lowercase without any digits and punctuation, before tokenising the text and removing stopwords — which are words that provide little information — using the pre-made stopword list _“stopwords-iso”_ due to it being the most comprehensive.
 
 ```{r include=FALSE}
 #5.0 DATA PREPARATION: Filter the data
