@@ -199,7 +199,7 @@ install.packages("stopwords")
 library(stopwords)
 cleaned_tokenized_review <- tokenized_review %>%
   anti_join(get_stopwords()) %>%
-  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made lexicon called "stopwords-iso" 
+  filter(!word %in% stopwords(source="stopwords-iso")) #remove stopwords, where stopwords are extracted from a pre-made list called "stopwords-iso" 
 
 ##7.4 Clear memory
 rm(tokenized_review)
@@ -512,7 +512,7 @@ View(regression_tree_prediction)
 regression_tree_performance_mae <- mae(regression_tree_prediction, estimate = ".", truth=stars)
 
 View(regression_tree_performance_mae)
-#Finding: estimate = 1.355557
+#Finding: estimate = 1.354388
 
 ###18.2.2 Evaluating using rmse (Root Mean Squared Error)
 regression_tree_performance_rmse <- rmse(regression_tree_prediction, estimate = ".", truth=stars)
