@@ -1,5 +1,5 @@
 #1.0 Setting up
-#If unable to copy the code effectively from PDF, download the RScript Code3.4.R at https://github.com/Gareth-Warwick/DataAssignment
+#If unable to copy the code effectively from PDF, download "RScript Code3.4.R" at https://github.com/Gareth-Warwick/DataAssignment
 
 ##1.1 Setting Working Directory
 setwd("/Users/gare.mac/Desktop/Warwick/Y3/EC349/Summative Assignment/EC349 Assignment 3.0/EC349 Assignment 3.0")
