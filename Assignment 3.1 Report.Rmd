@@ -533,7 +533,7 @@ Comparing the models, we observe that the Ridge Regression has the lowest MSE. A
 
 | Model | MSE |
 |:-----:|:-----:|
-|OLS| 1.44264812413295|
+|OLS| 1.44264812413296|
 |Ridge| 1.44250610267150|
 |LASSO| 1.44261530919753|
 |Regression Decision Tree| 2.67815955669566|
